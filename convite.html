@@ -4,37 +4,40 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#1f5f4a">
+<meta name="theme-color" content="#1e4f91">
 <title>Convite — Discurso Público</title>
 <style>
-  :root { --verde: #1f5f4a; --verde-claro: #e7f1ec; --texto: #1c2421; --suave: #5d6b66; --fundo: #eef3f1; }
+  :root { --azul: #1e4f91; --azul-claro: #e8f0fb; --texto: #1c2230; --suave: #5d6675; --fundo: #eef2f8; }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--fundo); color: var(--texto); font: 16px/1.5 Georgia, "Times New Roman", serif; }
   .folha {
     max-width: 560px; margin: 24px auto; background: #fff; border-radius: 16px; overflow: hidden;
     box-shadow: 0 2px 6px rgba(0,0,0,.06), 0 12px 32px rgba(0,0,0,.06);
   }
-  .faixa { background: var(--verde); color: #fff; text-align: center; padding: 26px 20px 22px; }
+  .faixa { background: var(--azul); color: #fff; text-align: center; padding: 26px 20px 22px; }
   .faixa small { font: 600 12px/1 system-ui, sans-serif; letter-spacing: .18em; text-transform: uppercase; opacity: .85; }
   .faixa h1 { margin: 8px 0 0; font-size: 28px; font-weight: 400; }
   .conteudo { padding: 26px 24px 28px; }
   .saudacao { font-size: 18px; margin: 0 0 12px; }
   .conteudo p { margin: 0 0 14px; }
   .tema {
-    text-align: center; background: var(--verde-claro); border-radius: 12px; padding: 18px 16px; margin: 20px 0;
+    text-align: center; background: var(--azul-claro); border-radius: 12px; padding: 18px 16px; margin: 20px 0;
   }
-  .tema small { display: block; font: 600 12px/1 system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--verde); margin-bottom: 8px; }
+  .tema small { display: block; font: 600 12px/1 system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--azul); margin-bottom: 8px; }
   .tema strong { font-size: 21px; font-weight: 400; line-height: 1.3; }
   dl { display: grid; grid-template-columns: auto 1fr; gap: 10px 14px; margin: 0 0 20px; font-family: system-ui, sans-serif; font-size: 15px; }
   dt { color: var(--suave); }
   dd { margin: 0; font-weight: 600; }
-  dd a { color: var(--verde); }
+  dd a { color: var(--azul); }
   .assinatura { margin-top: 22px; font-style: italic; color: var(--suave); }
   .acoes { max-width: 560px; margin: 0 auto 32px; padding: 0 16px; text-align: center; }
-  .acoes button {
-    font: 700 15px system-ui, sans-serif; padding: 12px 22px; border-radius: 10px; border: 0;
-    background: var(--verde); color: #fff; cursor: pointer;
+  .agenda-titulo { font: 600 14px system-ui, sans-serif; color: var(--suave); margin: 0 0 10px; }
+  .botao {
+    display: inline-block; font: 700 15px system-ui, sans-serif; padding: 12px 20px; border-radius: 10px;
+    border: 2px solid var(--azul); background: var(--azul); color: #fff; cursor: pointer; text-decoration: none;
+    margin: 0 4px 10px;
   }
+  .botao.secundario { background: #fff; color: var(--azul); }
   .invalido { max-width: 480px; margin: 60px auto; padding: 0 16px; text-align: center; font-family: system-ui, sans-serif; color: var(--suave); }
   @media (max-width: 600px) { .folha { margin: 0 0 16px; border-radius: 0; } }
   @media print {
@@ -63,7 +66,12 @@
     <p class="assinatura" id="assinatura"></p>
   </div>
 </article>
-<div class="acoes" id="acoes" hidden><button type="button" onclick="window.print()">Salvar em PDF / Imprimir</button></div>
+<div class="acoes" id="acoes" hidden>
+  <p class="agenda-titulo">Para ser lembrado, adicione à sua agenda:</p>
+  <a class="botao" id="agenda-google" target="_blank" rel="noopener">📅 Adicionar ao Google Agenda</a>
+  <button type="button" class="botao secundario" id="agenda-ics">Outra agenda (iPhone, Outlook)</button>
+  <button type="button" class="botao secundario" onclick="window.print()">Salvar em PDF / Imprimir</button>
+</div>
 <p class="invalido" id="invalido" hidden>Link de convite inválido ou incompleto. Peça um novo link a quem o enviou.</p>
 
 <script>
@@ -111,10 +119,49 @@ try {
   }
   $('assinatura').textContent = congregacao ? `Seus irmãos da Congregação ${congregacao}` : 'Seus irmãos';
   document.title = `Convite — ${c.n} — ${d}/${m}/${a}`;
+  prepararAgenda(c, congregacao);
   $('convite').hidden = false;
   $('acoes').hidden = false;
 } catch (err) {
   $('invalido').hidden = false;
+}
+
+/** Botões "Adicionar ao Google Agenda" e arquivo .ics (lembretes 1 semana e 1 dia antes). */
+function prepararAgenda(c, congregacao) {
+  const titulo = `Discurso público${congregacao ? ' — Congregação ' + congregacao : ''} (Tema nº ${c.t})`;
+  const detalhes = `Tema nº ${c.t} — ${c.tt}\n\nConvite: ${location.href}`;
+  const local = c.e || congregacao;
+  const utc = dt => dt.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  let datas, ini, fim;
+  if (/^\d{1,2}:\d{2}$/.test(c.h || '')) {
+    // Horário de Fortaleza (UTC-3, sem horário de verão).
+    const inicio = new Date(`${c.d}T${c.h.padStart(5, '0')}:00-03:00`);
+    const termino = new Date(inicio.getTime() + 3600e3);
+    datas = `${utc(inicio)}/${utc(termino)}`;
+    ini = `DTSTART:${utc(inicio)}`; fim = `DTEND:${utc(termino)}`;
+  } else {
+    const dia = c.d.replace(/-/g, '');
+    const seguinte = new Date(Date.parse(c.d + 'T12:00:00Z') + 864e5).toISOString().slice(0, 10).replace(/-/g, '');
+    datas = `${dia}/${seguinte}`;
+    ini = `DTSTART;VALUE=DATE:${dia}`; fim = `DTEND;VALUE=DATE:${seguinte}`;
+  }
+  $('agenda-google').href = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+    `&text=${encodeURIComponent(titulo)}&dates=${datas}` +
+    `&details=${encodeURIComponent(detalhes)}&location=${encodeURIComponent(local)}`;
+
+  // Texto no formato do .ics: escapa vírgula, ponto e vírgula, barra invertida e quebra de linha.
+  const txt = v => String(v).replace(/([,;\\])/g, '\\$1').replace(/\n/g, '\\n');
+  const alarme = g => ['BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${txt(titulo)}`, `TRIGGER:${g}`, 'END:VALARM'];
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Convite Oradores//PT-BR', 'BEGIN:VEVENT',
+    `UID:${c.d}-${c.t}@convite-oradores`, `DTSTAMP:${utc(new Date())}`, ini, fim,
+    `SUMMARY:${txt(titulo)}`, `DESCRIPTION:${txt(detalhes)}`, `LOCATION:${txt(local)}`,
+    ...alarme('-P7D'), ...alarme('-P1D'), 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  $('agenda-ics').onclick = () => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+    a.download = 'discurso.ics';
+    a.click();
+  };
 }
 </script>
 </body>
