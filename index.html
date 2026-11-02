@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1f5f4a">
+<title>Convite para Discurso Público</title>
+<style>
+  :root {
+    --verde: #1f5f4a;
+    --verde-claro: #e7f1ec;
+    --verde-medio: #2f7d63;
+    --texto: #1c2421;
+    --suave: #5d6b66;
+    --borda: #d5dfdb;
+    --fundo: #f4f7f6;
+    --cartao: #ffffff;
+    --erro: #b3261e;
+    --erro-fundo: #fcebea;
+    --raio: 14px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--fundo); color: var(--texto);
+    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    background: var(--verde); color: #fff;
+    padding: 28px 16px 56px; text-align: center;
+  }
+  header small { display: block; opacity: .8; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; }
+  header h1 { margin: 4px 0 6px; font-size: 24px; line-height: 1.2; }
+  header p { margin: 0; opacity: .9; font-size: 14px; }
+  main { max-width: 640px; margin: -36px auto 0; padding: 0 16px 40px; }
+  .cartao {
+    background: var(--cartao); border-radius: var(--raio); padding: 20px 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04); margin-bottom: 16px;
+  }
+  .passo { display: flex; align-items: center; gap: 10px; margin: 0 0 4px; font-size: 18px; }
+  .passo b {
+    flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--verde); color: #fff;
+    display: grid; place-items: center; font-size: 14px;
+  }
+  .ajuda { color: var(--suave); font-size: 14px; margin: 0 0 14px; }
+  .local { font-size: 14px; color: var(--suave); margin: 0; }
+  .local strong { color: var(--texto); }
+  .local a { color: var(--verde-medio); font-weight: 600; display: inline-block; margin-top: 4px; }
+
+  /* Datas */
+  .mes { font-size: 13px; font-weight: 600; color: var(--suave); text-transform: uppercase; letter-spacing: .06em; margin: 14px 0 8px; }
+  .mes:first-child { margin-top: 0; }
+  .grade-datas { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+  .data input { position: absolute; opacity: 0; pointer-events: none; }
+  .data span {
+    display: flex; flex-direction: column; align-items: center; padding: 10px 4px;
+    border: 1.5px solid var(--borda); border-radius: 12px; cursor: pointer; user-select: none;
+    transition: border-color .15s, background .15s;
+  }
+  .data span i { font-style: normal; font-size: 11px; text-transform: uppercase; color: var(--suave); }
+  .data span strong { font-size: 22px; line-height: 1.1; }
+  .data input:checked + span { border-color: var(--verde); background: var(--verde); color: #fff; }
+  .data span b { font-size: 12px; font-weight: 600; color: var(--verde-medio); margin-top: 2px; }
+  .data input:checked + span i, .data input:checked + span b { color: #d6ebe2; }
+  .data input:focus-visible + span { outline: 3px solid #9cc9b6; outline-offset: 2px; }
+
+  /* Temas */
+  .busca { position: relative; margin-bottom: 10px; }
+  .busca input[type=search] { padding-left: 40px; }
+  .busca svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--suave); }
+  .barra-temas { display: flex; justify-content: space-between; align-items: center; font-size: 14px; margin-bottom: 8px; gap: 8px; }
+  .contador { background: var(--verde-claro); color: var(--verde); font-weight: 600; padding: 3px 10px; border-radius: 99px; }
+  .so-marcados { display: flex; align-items: center; gap: 6px; color: var(--suave); cursor: pointer; }
+  .lista-temas {
+    max-height: 360px; overflow-y: auto; border: 1px solid var(--borda); border-radius: 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tema { display: flex; gap: 12px; align-items: flex-start; padding: 11px 12px; border-bottom: 1px solid #edf1ef; cursor: pointer; }
+  .tema:last-child { border-bottom: 0; }
+  .tema input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--verde); }
+  .tema .num { flex: none; min-width: 34px; font-weight: 600; color: var(--verde); font-variant-numeric: tabular-nums; }
+  .tema.marcado { background: var(--verde-claro); }
+  .vazio { padding: 18px; text-align: center; color: var(--suave); font-size: 14px; }
+
+  /* Campos */
+  .campo { margin-bottom: 14px; }
+  .campo:last-child { margin-bottom: 0; }
+  label.rotulo { display: block; font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+  label.rotulo em { color: var(--erro); font-style: normal; }
+  label.rotulo span { font-weight: 400; color: var(--suave); font-size: 13px; }
+  input[type=text], input[type=tel], input[type=email], input[type=search] {
+    width: 100%; font: inherit; padding: 12px 14px; border: 1.5px solid var(--borda);
+    border-radius: 10px; background: #fff; color: var(--texto);
+  }
+  input:focus { outline: none; border-color: var(--verde-medio); box-shadow: 0 0 0 3px #d3e8df; }
+  .msg-erro { display: none; color: var(--erro); font-size: 13px; margin-top: 6px; }
+  .invalido .msg-erro { display: block; }
+  .invalido input[type=text], .invalido input[type=tel], .invalido input[type=email] { border-color: var(--erro); }
+  .cartao.invalido { box-shadow: 0 0 0 2px var(--erro); }
+  .isca { position: absolute; left: -9999px; }
+
+  button.enviar {
+    width: 100%; font: inherit; font-size: 17px; font-weight: 700; letter-spacing: .04em;
+    padding: 16px; border: 0; border-radius: 12px; background: var(--verde); color: #fff; cursor: pointer;
+  }
+  button.enviar:disabled { opacity: .6; cursor: progress; }
+  button.secundario {
+    font: inherit; padding: 10px 16px; border-radius: 10px; border: 1.5px solid var(--verde);
+    background: #fff; color: var(--verde); font-weight: 600; cursor: pointer;
+  }
+  .alerta { background: var(--erro-fundo); color: var(--erro); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; font-size: 15px; }
+  .aviso-demo { background: #fff6dc; color: #6b5200; border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; font-size: 14px; }
+  .carregando { text-align: center; padding: 40px 16px; color: var(--suave); }
+  .giro {
+    width: 28px; height: 28px; border: 3px solid var(--borda); border-top-color: var(--verde);
+    border-radius: 50%; margin: 0 auto 12px; animation: giro 0.8s linear infinite;
+  }
+  @keyframes giro { to { transform: rotate(360deg); } }
+  .sucesso { text-align: center; padding: 30px 20px; }
+  .sucesso .ok {
+    width: 64px; height: 64px; border-radius: 50%; background: var(--verde-claro); color: var(--verde);
+    display: grid; place-items: center; margin: 0 auto 14px;
+  }
+  .sucesso h2 { margin: 0 0 6px; }
+  .resumo { text-align: left; background: var(--fundo); border-radius: 12px; padding: 14px 16px; margin: 18px 0 0; font-size: 15px; }
+  .resumo dt { color: var(--suave); font-size: 13px; }
+  .resumo dd { margin: 0 0 10px; }
+  .resumo dd:last-child { margin-bottom: 0; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <small>Convite</small>
+  <h1 id="titulo">Discurso Público</h1>
+  <p id="subtitulo">Escolha a data, marque seus temas e envie seus dados.</p>
+</header>
+
+<main>
+  <div id="estado-carregando" class="cartao carregando"><div class="giro"></div>Carregando datas disponíveis…</div>
+
+  <div id="estado-falha" class="cartao" hidden>
+    <p class="alerta" id="falha-texto">Não foi possível carregar as datas.</p>
+    <button class="secundario" type="button" onclick="carregar()">Tentar novamente</button>
+  </div>
+
+  <form id="form" novalidate hidden>
+    <div id="aviso-demo" class="aviso-demo" hidden>
+      <strong>Modo demonstração:</strong> a página ainda não está ligada à planilha
+      (<code>SCRIPT_URL</code> vazio). Nada será gravado.
+    </div>
+    <div id="alerta" class="alerta" hidden></div>
+
+    <section class="cartao" id="info-local" hidden>
+      <p class="local" id="local-texto"></p>
+    </section>
+
+    <section class="cartao" id="bloco-data">
+      <h2 class="passo"><b>1</b> Escolha a data</h2>
+      <p class="ajuda">Só aparecem as datas ainda livres. Escolha a melhor para você.</p>
+      <div id="datas"></div>
+      <p class="msg-erro">Escolha uma data.</p>
+    </section>
+
+    <section class="cartao" id="bloco-temas">
+      <h2 class="passo"><b>2</b> Temas que você tem preparados</h2>
+      <p class="ajuda">Marque todos os esboços que você já tem prontos.</p>
+      <div class="busca">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="busca" placeholder="Buscar por número ou palavra" autocomplete="off" aria-label="Buscar tema">
+      </div>
+      <div class="barra-temas">
+        <span class="contador" id="contador">0 marcados</span>
+        <label class="so-marcados"><input type="checkbox" id="so-marcados"> Só os marcados</label>
+      </div>
+      <div class="lista-temas" id="temas" role="group" aria-label="Lista de temas"></div>
+      <p class="msg-erro">Marque pelo menos um tema.</p>
+    </section>
+
+    <section class="cartao">
+      <h2 class="passo"><b>3</b> Seus dados</h2>
+      <p class="ajuda">Campos com <em style="color:var(--erro);font-style:normal">*</em> são obrigatórios.</p>
+      <div class="campo" id="campo-nome">
+        <label class="rotulo" for="nome">Nome e sobrenome <em>*</em></label>
+        <input type="text" id="nome" autocomplete="name" maxlength="120" required>
+        <p class="msg-erro">Informe seu nome e sobrenome.</p>
+      </div>
+      <div class="campo" id="campo-congregacao">
+        <label class="rotulo" for="congregacao">Congregação <em>*</em></label>
+        <input type="text" id="congregacao" maxlength="120" required>
+        <p class="msg-erro">Informe sua congregação.</p>
+      </div>
+      <div class="campo" id="campo-whatsapp">
+        <label class="rotulo" for="whatsapp">WhatsApp</label>
+        <input type="tel" id="whatsapp" inputmode="tel" autocomplete="tel" placeholder="(85) 99999-9999" maxlength="20">
+        <p class="msg-erro">Número incompleto. Use DDD + número.</p>
+      </div>
+      <div class="campo" id="campo-email">
+        <label class="rotulo" for="email">E-mail <span>(jwpub.org)</span></label>
+        <input type="email" id="email" inputmode="email" autocomplete="email" placeholder="seunome@jwpub.org" maxlength="120">
+        <p class="msg-erro">Use o seu e-mail @jwpub.org.</p>
+      </div>
+      <input type="text" name="site" id="site" class="isca" tabindex="-1" autocomplete="off" aria-hidden="true">
+    </section>
+
+    <button class="enviar" type="submit" id="enviar">ENVIAR</button>
+  </form>
+
+  <section id="estado-sucesso" class="cartao sucesso" hidden>
+    <div class="ok"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h2>Obrigado!</h2>
+    <p class="ajuda" style="margin:0">Sua data foi reservada. Em breve você receberá o convite com o tema escolhido.</p>
+    <dl class="resumo" id="resumo"></dl>
+  </section>
+</main>
+
+<script>
+/* ============================================================================
+   CONFIGURAÇÃO — cole aqui a URL do App da Web do Apps Script (termina em /exec).
+   Vazio = modo demonstração (dados de exemplo, nada é gravado).
+   ========================================================================== */
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby35Ig9fxfNyqpGttdysn9kJjQzW0WDSGbNvo1Wk_pttTOX3eMzvAXh5Pg6F6Ah-F4D2A/exec';
+
+const DEMO = {
+  ok: true,
+  datas: ['2026-12-06', '2026-12-13', '2026-12-20', '2026-12-27', '2027-01-02', '2027-01-09', '2027-01-16']
+    .map(data => ({ data, horario: data >= '2027' ? '18:30' : '09:30' })),
+  temas: [
+    [1, 'Você conhece bem a Deus?'], [2, 'Você vai sobreviver aos últimos dias?'],
+    [10, 'Seja honesto em tudo'], [16, 'Seja cada vez mais amigo de Jeová'],
+    [24, 'Você encontrou “uma pérola de grande valor”?'], [32, 'Como lidar com as ansiedades da vida'],
+    [54, 'Fortaleça sua fé em Deus e em suas promessas'], [66, 'Você também vai participar na colheita?'],
+    [76, 'Princípios bíblicos — podem nos ajudar a lidar com os problemas atuais?'],
+    [141, 'Quando terão fim os gemidos da criação humana?'], [187, 'Por que um Deus amoroso permite a maldade?'],
+    [194, 'Como a sabedoria de Deus nos ajuda'],
+  ].map(([numero, titulo]) => ({ numero, titulo })),
+  config: {
+    titulo: 'Discurso Público', congregacao: 'Maraponga',
+    endereco: 'R. Benjamim Brasil, 618 - Mondubim, Fortaleza - CE, 60712-000',
+    mapa: 'https://maps.app.goo.gl/5PfpVtjNya3MWx7v9',
+  },
+};
+
+const $ = id => document.getElementById(id);
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const DIAS = ['dom','seg','ter','qua','qui','sex','sáb'];
+const DIAS_LONGO = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+
+let temas = [];
+const horarios = {}; // 'aaaa-mm-dd' → '18:30'
+const marcados = new Set();
+
+function paraData(iso) { const [a, m, d] = iso.split('-').map(Number); return new Date(a, m - 1, d); }
+function dataPorExtenso(iso) {
+  const d = paraData(iso);
+  return `${DIAS_LONGO[d.getDay()]}, ${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`;
+}
+function semAcento(s) { return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+function mostrar(estado) {
+  for (const id of ['estado-carregando', 'estado-falha', 'form', 'estado-sucesso']) $(id).hidden = id !== estado;
+}
+
+async function carregar() {
+  mostrar('estado-carregando');
+  try {
+    const dados = SCRIPT_URL ? await (await fetch(SCRIPT_URL + '?t=' + Date.now())).json() : DEMO;
+    if (!dados.ok) throw new Error(dados.mensagem || 'Erro na planilha');
+    aplicarConfig(dados.config || {});
+    temas = dados.temas;
+    desenharDatas(dados.datas);
+    desenharTemas();
+    $('aviso-demo').hidden = !!SCRIPT_URL;
+    mostrar('form');
+  } catch (err) {
+    console.error(err);
+    $('falha-texto').textContent = 'Não foi possível carregar as datas. Verifique sua internet e tente novamente.';
+    mostrar('estado-falha');
+  }
+}
+
+function aplicarConfig(c) {
+  if (c.titulo) { $('titulo').textContent = c.titulo; document.title = 'Convite — ' + c.titulo; }
+  if (c.congregacao) $('subtitulo').textContent = 'Congregação ' + c.congregacao.replace(/^congrega[cç][aã]o\s+/i, '');
+  const mapa = /^https:\/\//.test(c.mapa || '') ? c.mapa : '';
+  const congregacao = (c.congregacao || '').replace(/^congrega[cç][aã]o\s+/i, '');
+  $('local-texto').innerHTML = [
+    congregacao ? `<strong>Local do discurso:</strong> Congregação ${esc(congregacao)}` : '',
+    c.endereco ? esc(c.endereco) : '',
+    mapa ? `<a href="${esc(mapa)}" target="_blank" rel="noopener">📍 Ver no mapa</a>` : '',
+  ].filter(Boolean).join('<br>');
+  $('info-local').hidden = !congregacao && !c.endereco;
+}
+
+function desenharDatas(datas) {
+  const caixa = $('datas');
+  if (!datas.length) {
+    caixa.innerHTML = '<p class="vazio">No momento não há datas livres. Fale com o irmão que enviou o link.</p>';
+    $('enviar').disabled = true;
+    return;
+  }
+  $('enviar').disabled = false;
+  const porMes = new Map();
+  for (const item of datas) {
+    horarios[item.data] = item.horario || '';
+    const chave = item.data.slice(0, 7);
+    if (!porMes.has(chave)) porMes.set(chave, []);
+    porMes.get(chave).push(item.data);
+  }
+  caixa.innerHTML = [...porMes].map(([chave, lista]) => {
+    const [a, m] = chave.split('-').map(Number);
+    return `<p class="mes">${MESES[m - 1]} ${a}</p><div class="grade-datas">` + lista.map(iso => {
+      const d = paraData(iso);
+      return `<label class="data"><input type="radio" name="data" value="${iso}" aria-label="${dataPorExtenso(iso)}">
+        <span><i>${DIAS[d.getDay()]}</i><strong>${d.getDate()}</strong><i>${MESES[d.getMonth()].slice(0, 3)}</i>${horarios[iso] ? `<b>${esc(horarios[iso])}</b>` : ''}</span></label>`;
+    }).join('') + '</div>';
+  }).join('');
+}
+
+function desenharTemas() {
+  const termo = semAcento($('busca').value.trim());
+  const soMarcados = $('so-marcados').checked;
+  const visiveis = temas.filter(t => {
+    if (soMarcados && !marcados.has(t.numero)) return false;
+    if (!termo) return true;
+    return /^\d+$/.test(termo) ? String(t.numero).startsWith(termo) : semAcento(t.titulo).includes(termo);
+  });
+  $('temas').innerHTML = visiveis.length
+    ? visiveis.map(t => {
+        const m = marcados.has(t.numero);
+        return `<label class="tema${m ? ' marcado' : ''}"><input type="checkbox" value="${t.numero}"${m ? ' checked' : ''}>
+          <span class="num">${t.numero}</span><span>${esc(t.titulo)}</span></label>`;
+      }).join('')
+    : `<p class="vazio">${soMarcados && !marcados.size ? 'Nenhum tema marcado ainda.' : 'Nenhum tema encontrado.'}</p>`;
+  atualizarContador();
+}
+
+function atualizarContador() {
+  const n = marcados.size;
+  $('contador').textContent = n === 1 ? '1 marcado' : `${n} marcados`;
+}
+
+$('temas').addEventListener('change', e => {
+  const cb = e.target;
+  const n = Number(cb.value);
+  cb.checked ? marcados.add(n) : marcados.delete(n);
+  cb.closest('.tema').classList.toggle('marcado', cb.checked);
+  atualizarContador();
+  if (marcados.size) $('bloco-temas').classList.remove('invalido');
+});
+$('busca').addEventListener('input', desenharTemas);
+$('so-marcados').addEventListener('change', desenharTemas);
+$('datas').addEventListener('change', () => $('bloco-data').classList.remove('invalido'));
+
+$('whatsapp').addEventListener('input', e => {
+  let d = e.target.value.replace(/\D/g, '');
+  if (d.startsWith('55') && d.length > 11) d = d.slice(2);
+  d = d.slice(0, 11);
+  let f = d;
+  if (d.length > 2) f = `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length > 6) f = `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}`;
+  e.target.value = f;
+});
+for (const id of ['nome', 'congregacao', 'whatsapp', 'email']) {
+  $(id).addEventListener('input', () => $('campo-' + id).classList.remove('invalido'));
+}
+
+function validar() {
+  const erros = [];
+  const marcar = (el, ok) => { el.classList.toggle('invalido', !ok); if (!ok) erros.push(el); };
+  marcar($('bloco-data'), !!document.querySelector('input[name=data]:checked'));
+  marcar($('bloco-temas'), marcados.size > 0);
+  marcar($('campo-nome'), $('nome').value.trim().split(/\s+/).filter(Boolean).length >= 2);
+  marcar($('campo-congregacao'), $('congregacao').value.trim().length >= 2);
+  const zap = $('whatsapp').value.replace(/\D/g, '');
+  marcar($('campo-whatsapp'), !zap || zap.length >= 10);
+  const email = $('email').value.trim();
+  marcar($('campo-email'), !email || /^[^\s@]+@jwpub\.org$/i.test(email));
+  return erros;
+}
+
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  $('alerta').hidden = true;
+  const erros = validar();
+  if (erros.length) { erros[0].scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+
+  const dados = {
+    data: document.querySelector('input[name=data]:checked').value,
+    temas: [...marcados].sort((a, b) => a - b),
+    nome: $('nome').value.trim(),
+    congregacao: $('congregacao').value.trim(),
+    whatsapp: $('whatsapp').value.trim(),
+    email: $('email').value.trim().toLowerCase(),
+    site: $('site').value,
+  };
+
+  const botao = $('enviar');
+  botao.disabled = true;
+  botao.textContent = 'ENVIANDO…';
+  try {
+    let resp;
+    if (SCRIPT_URL) {
+      // text/plain evita a verificação CORS "preflight", que o Apps Script não responde.
+      resp = await (await fetch(SCRIPT_URL, {
+        method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(dados),
+      })).json();
+    } else {
+      await new Promise(r => setTimeout(r, 600));
+      resp = { ok: true, id: 'DEMO' };
+    }
+    if (resp.ok) return sucesso(dados);
+    if (resp.erro === 'DATA_INDISPONIVEL') {
+      const atual = await (await fetch(SCRIPT_URL + '?t=' + Date.now())).json();
+      if (atual.ok) desenharDatas(atual.datas);
+      erroTopo(resp.mensagem);
+      $('bloco-data').classList.add('invalido');
+      $('bloco-data').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      erroTopo(resp.mensagem || 'Não foi possível enviar. Tente novamente.');
+    }
+  } catch (err) {
+    console.error(err);
+    erroTopo('Falha de conexão. Verifique sua internet e toque em ENVIAR de novo.');
+  } finally {
+    botao.disabled = false;
+    botao.textContent = 'ENVIAR';
+  }
+});
+
+function erroTopo(msg) {
+  $('alerta').textContent = msg;
+  $('alerta').hidden = false;
+  $('alerta').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function sucesso(d) {
+  const lista = temas.filter(t => d.temas.includes(t.numero)).map(t => `${t.numero} — ${esc(t.titulo)}`).join('<br>');
+  $('resumo').innerHTML = `
+    <dt>Data</dt><dd>${dataPorExtenso(d.data)}${horarios[d.data] ? ', às ' + esc(horarios[d.data].replace(':', 'h')) : ''}</dd>
+    <dt>Orador</dt><dd>${esc(d.nome)} · ${esc(d.congregacao)}</dd>
+    <dt>Temas preparados</dt><dd>${lista}</dd>`;
+  mostrar('estado-sucesso');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+carregar();
+</script>
+</body>
+</html>

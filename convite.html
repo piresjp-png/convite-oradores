@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1f5f4a">
+<title>Convite — Discurso Público</title>
+<style>
+  :root { --verde: #1f5f4a; --verde-claro: #e7f1ec; --texto: #1c2421; --suave: #5d6b66; --fundo: #eef3f1; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fundo); color: var(--texto); font: 16px/1.5 Georgia, "Times New Roman", serif; }
+  .folha {
+    max-width: 560px; margin: 24px auto; background: #fff; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06), 0 12px 32px rgba(0,0,0,.06);
+  }
+  .faixa { background: var(--verde); color: #fff; text-align: center; padding: 26px 20px 22px; }
+  .faixa small { font: 600 12px/1 system-ui, sans-serif; letter-spacing: .18em; text-transform: uppercase; opacity: .85; }
+  .faixa h1 { margin: 8px 0 0; font-size: 28px; font-weight: 400; }
+  .conteudo { padding: 26px 24px 28px; }
+  .saudacao { font-size: 18px; margin: 0 0 12px; }
+  .conteudo p { margin: 0 0 14px; }
+  .tema {
+    text-align: center; background: var(--verde-claro); border-radius: 12px; padding: 18px 16px; margin: 20px 0;
+  }
+  .tema small { display: block; font: 600 12px/1 system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--verde); margin-bottom: 8px; }
+  .tema strong { font-size: 21px; font-weight: 400; line-height: 1.3; }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 10px 14px; margin: 0 0 20px; font-family: system-ui, sans-serif; font-size: 15px; }
+  dt { color: var(--suave); }
+  dd { margin: 0; font-weight: 600; }
+  dd a { color: var(--verde); }
+  .assinatura { margin-top: 22px; font-style: italic; color: var(--suave); }
+  .acoes { max-width: 560px; margin: 0 auto 32px; padding: 0 16px; text-align: center; }
+  .acoes button {
+    font: 700 15px system-ui, sans-serif; padding: 12px 22px; border-radius: 10px; border: 0;
+    background: var(--verde); color: #fff; cursor: pointer;
+  }
+  .invalido { max-width: 480px; margin: 60px auto; padding: 0 16px; text-align: center; font-family: system-ui, sans-serif; color: var(--suave); }
+  @media (max-width: 600px) { .folha { margin: 0 0 16px; border-radius: 0; } }
+  @media print {
+    body { background: #fff; }
+    .folha { box-shadow: none; margin: 0 auto; }
+    .faixa, .tema { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .acoes { display: none; }
+  }
+</style>
+</head>
+<body>
+<article class="folha" id="convite" hidden>
+  <div class="faixa">
+    <small>Convite</small>
+    <h1>Discurso Público</h1>
+  </div>
+  <div class="conteudo">
+    <p class="saudacao">Prezado irmão <strong id="nome"></strong>,</p>
+    <p id="texto-convite"></p>
+    <div class="tema">
+      <small id="tema-num"></small>
+      <strong id="tema-titulo"></strong>
+    </div>
+    <dl id="detalhes"></dl>
+    <p>Agradecemos de coração sua disposição. Ficaremos felizes em recebê-lo!</p>
+    <p class="assinatura" id="assinatura"></p>
+  </div>
+</article>
+<div class="acoes" id="acoes" hidden><button type="button" onclick="window.print()">Salvar em PDF / Imprimir</button></div>
+<p class="invalido" id="invalido" hidden>Link de convite inválido ou incompleto. Peça um novo link a quem o enviou.</p>
+
+<script>
+// Os dados vêm no "#" do link (gerado pela tela de administração) e não passam por nenhum servidor.
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const DIAS = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+const $ = id => document.getElementById(id);
+
+function ler() {
+  const b64 = location.hash.slice(1).replace(/-/g, '+').replace(/_/g, '/');
+  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
+try {
+  const c = ler();
+  if (!c.n || !c.d || !c.tt) throw new Error('incompleto');
+  const [a, m, d] = c.d.split('-').map(Number);
+  const dia = DIAS[new Date(a, m - 1, d).getDay()];
+  const quando = `${dia}, ${d} de ${MESES[m - 1]} de ${a}`;
+  const congregacao = (c.c || '').replace(/^congrega[cç][aã]o\s+/i, '');
+
+  $('nome').textContent = c.n;
+  $('texto-convite').textContent = congregacao
+    ? `Com muita alegria, a Congregação ${congregacao} confirma o seu convite para proferir o discurso público:`
+    : 'Com muita alegria, confirmamos o seu convite para proferir o discurso público:';
+  $('tema-num').textContent = c.t ? `Tema nº ${c.t}` : 'Tema';
+  $('tema-titulo').textContent = c.tt;
+
+  const linhas = [['Data', quando.charAt(0).toUpperCase() + quando.slice(1)]];
+  if (c.h) linhas.push(['Horário', c.h.replace(':', 'h')]);
+  if (congregacao) linhas.push(['Congregação', congregacao]);
+  if (c.e) linhas.push(['Local', c.e]);
+  for (const [k, v] of linhas) {
+    const dt = document.createElement('dt'); dt.textContent = k;
+    const dd = document.createElement('dd'); dd.textContent = v;
+    $('detalhes').append(dt, dd);
+  }
+  if (/^https:\/\//.test(c.m || '')) {
+    const dt = document.createElement('dt'); dt.textContent = 'Mapa';
+    const a = document.createElement('a');
+    a.href = c.m; a.target = '_blank'; a.rel = 'noopener'; a.textContent = '📍 Abrir no Google Maps';
+    const dd = document.createElement('dd'); dd.append(a);
+    $('detalhes').append(dt, dd);
+  }
+  $('assinatura').textContent = congregacao ? `Seus irmãos da Congregação ${congregacao}` : 'Seus irmãos';
+  document.title = `Convite — ${c.n} — ${d}/${m}/${a}`;
+  $('convite').hidden = false;
+  $('acoes').hidden = false;
+} catch (err) {
+  $('invalido').hidden = false;
+}
+</script>
+</body>
+</html>
