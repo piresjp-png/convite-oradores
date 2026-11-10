@@ -4,176 +4,202 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#1e4f91">
+<meta name="theme-color" content="#173d70">
 <title>Convite de Orador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  /* Layout baseado no modelo em Word da congregação ("Convite de Orador"). */
   :root {
-    --azul: #1e4f91; --azul-escuro: #173d70; --azul-claro: #e8f0fb;
-    --texto: #1c2230; --suave: #5d6675; --fundo: #eef2f8;
-    --serifa: "Times New Roman", Times, Georgia, serif;
-    --sem-serifa: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+    --azul: #1e4f91; --azul-escuro: #173d70; --azul-claro: #eaf1fb; --azul-linha: #c9d8ee;
+    --dourado: #b08d3c;
+    --texto: #1f2633; --suave: #5d6675; --fundo: #e9eef5;
+    --titulo: "Lora", Georgia, "Times New Roman", serif;
+    --corpo: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--fundo); color: var(--texto); font: 17px/1.45 var(--serifa); }
+  body { margin: 0; background: var(--fundo); color: var(--texto); font: 16px/1.5 var(--corpo); }
   .folha {
-    width: 100%; max-width: 210mm; margin: 20px auto; background: #fff; padding: 12mm 14mm 10mm;
-    box-shadow: 0 2px 6px rgba(0,0,0,.06), 0 12px 32px rgba(0,0,0,.08);
+    max-width: 200mm; margin: 24px auto; background: #fff; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 2px 6px rgba(20,40,80,.06), 0 18px 40px rgba(20,40,80,.12);
   }
 
   /* Cabeçalho */
-  .topo { text-align: center; border-bottom: 3px solid var(--azul); padding-bottom: 8px; margin-bottom: 14px; }
-  .topo h1 { margin: 0; font: 700 34px/1.1 var(--sem-serifa); color: var(--azul); letter-spacing: .01em; }
-  .topo .cong { font-weight: 700; font-size: 22px; margin-top: 4px; }
-  .topo .end { font-size: 15px; }
-  .topo .email { font-weight: 700; color: var(--azul); font-size: 15px; }
+  .topo { background: linear-gradient(135deg, var(--azul-escuro), var(--azul)); color: #fff; text-align: center; padding: 26px 24px 22px; }
+  .topo .selo { font-size: 12px; letter-spacing: .32em; text-transform: uppercase; opacity: .85; }
+  .topo h1 { font: 600 36px/1.15 var(--titulo); margin: 6px 0 10px; }
+  .topo .filete { width: 64px; height: 2px; background: var(--dourado); margin: 0 auto 10px; }
+  .topo .cong { font: 600 18px var(--titulo); }
+  .topo .info { font-size: 14px; opacity: .9; }
 
-  .destinatario { font-weight: 700; font-size: 23px; line-height: 1.2; margin: 6px 0 10px; }
-  .texto p { text-align: justify; margin: 0 0 8px; }
+  .corpo { padding: 24px 32px 22px; }
+  .destinatario { font: 600 19px/1.3 var(--titulo); color: var(--azul-escuro); margin: 0 0 10px; }
+  .texto p { margin: 0 0 8px; text-align: justify; }
 
-  /* Tema, data e orador */
-  .tema { text-align: center; margin: 14px 0 10px; }
-  .tema small { display: block; font: 16px var(--sem-serifa); letter-spacing: .14em; color: var(--suave); }
-  .tema strong { display: block; font-size: 27px; line-height: 1.2; margin-top: 2px; }
-  .quando {
-    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-    font: 700 22px var(--sem-serifa); border-top: 1px solid #d5dde8; border-bottom: 1px solid #d5dde8; padding: 8px 4px;
-  }
-  .orador { display: flex; align-items: stretch; margin: 14px 0; border: 2px solid var(--azul); border-radius: 10px; overflow: hidden; }
-  .orador .rotulo { background: var(--azul); color: #fff; font: 700 21px var(--sem-serifa); padding: 10px 18px; display: flex; align-items: center; }
-  .orador .nome { flex: 1; text-align: center; font: 700 30px/1.2 "Segoe Script", "Brush Script MT", "Lucida Handwriting", cursive; padding: 8px 12px; }
+  /* Tema */
+  .tema { margin: 18px 0 16px; text-align: center; padding: 18px 20px; border: 1px solid var(--azul-linha);
+    border-radius: 12px; background: var(--azul-claro); }
+  .tema .rotulo { font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--suave); }
+  .tema .numero { display: inline-block; margin: 8px 0 4px; font: 700 14px var(--corpo); color: #fff; background: var(--azul);
+    border-radius: 99px; padding: 2px 12px; }
+  .tema .titulo { display: block; font: 600 25px/1.25 var(--titulo); color: var(--azul-escuro); }
 
-  /* Ícones clicáveis */
-  .icones { border-radius: 10px; overflow: hidden; border: 2px solid var(--azul-escuro); margin-bottom: 12px; }
-  .icones .faixa { background: var(--azul-escuro); color: #fff; text-align: center; font: 700 15px var(--sem-serifa); letter-spacing: .1em; padding: 6px; }
-  .icones .lista { display: flex; justify-content: space-around; padding: 10px 6px 8px; }
-  .icones a { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--texto); text-decoration: none; font: 700 13px var(--sem-serifa); }
-  .icones .bola { width: 50px; height: 50px; border-radius: 50%; background: #111; color: #fff; display: grid; place-items: center; }
-  .icones .bola.zap { background: #1a9e55; }
+  /* Data, horário, local */
+  .detalhes { display: grid; grid-template-columns: 1.4fr .8fr 1.4fr; gap: 10px; margin-bottom: 16px; }
+  .det { border: 1px solid var(--azul-linha); border-radius: 12px; padding: 10px 12px; display: flex; gap: 10px; align-items: center; }
+  .det svg { flex: none; color: var(--azul); }
+  .det small { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--suave); }
+  .det strong { display: block; font-size: 16px; line-height: 1.25; }
 
-  .contatos { font-size: 16px; margin-bottom: 10px; }
-  .contatos b { display: block; }
-  .mapa { text-align: center; margin: 4px 0 10px; }
-  .mapa h2 { font: 16px var(--sem-serifa); margin: 0 0 6px; }
-  .mapa img { width: 100%; max-width: 150mm; height: auto; border: 1px solid #d5dde8; }
-  .mapa .end { font: 14px var(--sem-serifa); margin-top: 2px; }
-  .importante { font-size: 16px; }
-  .importante p { margin: 0 0 4px; }
-  .fecho { text-align: right; font-size: 16px; margin-top: 10px; }
+  /* Orador */
+  .orador { text-align: center; margin: 4px 0 16px; }
+  .orador small { font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--suave); }
+  .orador .nome { font: italic 500 30px/1.2 var(--titulo); color: var(--azul-escuro); margin-top: 2px; }
+  .orador .linha { width: 220px; max-width: 70%; height: 1px; background: var(--dourado); margin: 6px auto 0; }
+
+  /* Ações (ligar, WhatsApp, como chegar) */
+  .atalhos { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+  .atalho { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 99px; text-decoration: none;
+    font-weight: 600; font-size: 15px; color: var(--azul-escuro); border: 1.5px solid var(--azul-linha); background: #fff; }
+  .atalho svg { color: var(--azul); }
+  .atalho.zap svg { color: #1a9e55; }
+
+  /* Rodapé em duas colunas */
+  .baixo { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; border-top: 1px solid var(--azul-linha); padding-top: 16px; }
+  .baixo h2 { font: 600 15px var(--titulo); color: var(--azul-escuro); margin: 0 0 6px; }
+  .mapa img { width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--azul-linha); display: block; }
+  .mapa .end { font-size: 13px; color: var(--suave); margin-top: 4px; }
+  .lado p { margin: 0 0 4px; font-size: 14.5px; }
+  .lado .bloco { margin-bottom: 12px; }
+  .lado .contato { font-size: 14px; }
+  .aviso { border-left: 3px solid var(--dourado); padding-left: 10px; }
+  .fecho { text-align: right; margin-top: 16px; font-size: 15px; }
   .fecho p { margin: 0; }
+  .fecho .assina { font: italic 500 17px var(--titulo); color: var(--azul-escuro); }
 
-  /* Botões (não saem na impressão) */
-  .acoes { max-width: 210mm; margin: 0 auto 32px; padding: 0 16px; text-align: center; }
-  .agenda-titulo { font: 600 14px system-ui, sans-serif; color: var(--suave); margin: 0 0 10px; }
-  .botao {
-    display: inline-block; font: 700 15px system-ui, sans-serif; padding: 12px 20px; border-radius: 10px;
-    border: 2px solid var(--azul); background: var(--azul); color: #fff; cursor: pointer; text-decoration: none; margin: 0 4px 10px;
-  }
-  .botao.secundario { background: #fff; color: var(--azul); }
-  .invalido { max-width: 480px; margin: 60px auto; padding: 0 16px; text-align: center; font-family: system-ui, sans-serif; color: var(--suave); }
+  /* Botões fora do convite (não saem na impressão) */
+  .acoes { max-width: 200mm; margin: 0 auto 32px; padding: 0 16px; text-align: center; }
+  .acoes p { font-size: 14px; color: var(--suave); margin: 0 0 10px; }
+  .botao { display: inline-block; font: 700 15px var(--corpo); padding: 12px 20px; border-radius: 10px; border: 2px solid var(--azul);
+    background: var(--azul); color: #fff; cursor: pointer; text-decoration: none; margin: 0 4px 10px; }
+  .botao.sec { background: #fff; color: var(--azul); }
+  .invalido { max-width: 480px; margin: 60px auto; padding: 0 16px; text-align: center; color: var(--suave); }
   [hidden] { display: none !important; }
 
-  @media (max-width: 600px) {
-    body { font-size: 15px; }
-    .folha { margin: 0 0 16px; padding: 18px 16px; }
-    .topo h1 { font-size: 27px; }
-    .destinatario { font-size: 19px; }
-    .tema strong { font-size: 21px; }
-    .quando { font-size: 17px; }
-    .orador .rotulo { font-size: 16px; padding: 8px 10px; }
-    .orador .nome { font-size: 23px; }
+  @media (max-width: 640px) {
+    .folha { margin: 0 0 16px; border-radius: 0; }
+    .topo h1 { font-size: 29px; }
+    .corpo { padding: 20px 18px; }
+    .tema .titulo { font-size: 21px; }
+    .detalhes { grid-template-columns: 1fr; }
+    .orador .nome { font-size: 26px; }
+    .baixo { grid-template-columns: 1fr; }
   }
-  /* Impressão / PDF: uma folha A4. */
-  @page { size: A4; margin: 8mm 10mm; }
+
+  /* Impressão / PDF: uma folha A4 */
+  @page { size: A4; margin: 0; }
   @media print {
-    body { background: #fff; font-size: 14px; line-height: 1.35; }
-    .folha { box-shadow: none; margin: 0; padding: 0; max-width: none; }
+    body { background: #fff; font-size: 13.5px; }
+    .folha { box-shadow: none; margin: 0; max-width: none; border-radius: 0; min-height: 297mm; }
     .acoes { display: none; }
-    .topo { margin-bottom: 8px; padding-bottom: 6px; }
-    .topo h1 { font-size: 28px; }
-    .topo .cong { font-size: 19px; margin-top: 2px; }
-    .destinatario { font-size: 20px; margin: 4px 0 6px; }
-    .texto p { margin-bottom: 5px; }
-    .tema { margin: 8px 0 6px; }
-    .tema strong { font-size: 23px; }
-    .quando { font-size: 19px; padding: 5px 4px; }
-    .orador { margin: 9px 0; }
-    .orador .rotulo { font-size: 18px; padding: 6px 16px; }
-    .orador .nome { font-size: 27px; padding: 4px 12px; }
-    .icones { margin-bottom: 8px; }
-    .icones .faixa { padding: 4px; font-size: 13px; }
-    .icones .lista { padding: 6px 6px 5px; }
-    .icones .bola { width: 40px; height: 40px; }
-    .contatos, .importante, .fecho { font-size: 14px; }
-    .contatos { margin-bottom: 6px; }
-    .mapa { margin: 2px 0 6px; }
-    .mapa h2 { font-size: 14px; margin-bottom: 4px; }
-    .mapa img { max-width: 112mm; }
-    .fecho { margin-top: 6px; }
-    .mapa, .importante, .fecho, .orador, .icones { break-inside: avoid; }
-    .orador .rotulo, .icones .faixa, .icones .bola, .topo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    a { color: inherit; }
+    .topo { padding: 18mm 16mm 7mm; }
+    .corpo { padding: 7mm 16mm 10mm; }
+    .tema { margin: 12px 0; padding: 12px 16px; }
+    .tema .titulo { font-size: 22px; }
+    .detalhes { margin-bottom: 12px; }
+    .orador { margin-bottom: 12px; }
+    .orador .nome { font-size: 27px; }
+    .atalhos { margin-bottom: 12px; }
+    .atalho { padding: 6px 12px; font-size: 13.5px; }
+    .lado p, .lado .contato { font-size: 13px; }
+    .topo, .tema, .tema .numero, .orador .linha, .topo .filete { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .folha, .baixo, .tema, .detalhes { break-inside: avoid; }
   }
 </style>
 </head>
 <body>
 <article class="folha" id="convite" hidden>
   <header class="topo">
-    <h1>Convite de Orador</h1>
+    <div class="selo">Convite</div>
+    <h1>Discurso Público</h1>
+    <div class="filete"></div>
     <div class="cong" id="anfitria"></div>
-    <div class="end" id="endereco"></div>
-    <div class="email" id="email-cong"></div>
+    <div class="info" id="endereco"></div>
+    <div class="info" id="email-cong"></div>
   </header>
 
-  <div class="destinatario" id="destinatario"></div>
-
-  <div class="texto">
-    <p>É um prazer convidar um dos oradores de sua congregação para proferir um discurso público em nossa
-      congregação. Com certeza será uma ocasião de edificação espiritual para os irmãos locais (Rom. 1:11).</p>
-    <p>Agradecemos de antemão, os esforços dos irmãos em colaborar com este arranjo teocrático.</p>
-  </div>
-
-  <div class="tema">
-    <small>TEMA DO DISCURSO</small>
-    <strong id="tema"></strong>
-  </div>
-  <div class="quando"><span id="data"></span><span id="horario"></span></div>
-
-  <div class="orador"><span class="rotulo">Orador</span><span class="nome" id="nome"></span></div>
-
-  <nav class="icones" id="icones" hidden>
-    <div class="faixa">CLIQUE NOS ÍCONES ABAIXO</div>
-    <div class="lista">
-      <a id="ic-tel" hidden><span class="bola"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg></span>TELEFONE</a>
-      <a id="ic-mapa" target="_blank" rel="noopener" hidden><span class="bola"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg></span>LOCALIZAÇÃO</a>
-      <a id="ic-zap" target="_blank" rel="noopener" hidden><span class="bola zap"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg></span>WHATSAPP</a>
+  <div class="corpo">
+    <p class="destinatario" id="destinatario">Prezados irmãos,</p>
+    <div class="texto">
+      <p>É um prazer convidar um dos oradores de sua congregação para proferir um discurso público em nossa
+        congregação. Com certeza será uma ocasião de edificação espiritual para os irmãos locais (Rom. 1:11).</p>
+      <p>Agradecemos de antemão os esforços dos irmãos em colaborar com este arranjo teocrático.</p>
     </div>
-  </nav>
 
-  <div class="contatos" id="contatos" hidden><b>Contatos:</b></div>
+    <section class="tema">
+      <div class="rotulo">Tema do discurso</div>
+      <span class="numero" id="tema-num" hidden></span>
+      <span class="titulo" id="tema-titulo"></span>
+    </section>
 
-  <section class="mapa" id="bloco-mapa">
-    <h2>Mapa – Como Chegar</h2>
-    <img id="mapa-img" src="mapa-como-chegar.png" alt="Mapa de como chegar ao Salão do Reino" onerror="this.remove()">
-    <div class="end" id="mapa-end"></div>
-  </section>
+    <section class="detalhes">
+      <div class="det">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        <div><small>Data</small><strong id="data"></strong></div>
+      </div>
+      <div class="det" id="det-hora">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <div><small>Horário</small><strong id="horario"></strong></div>
+      </div>
+      <div class="det">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+        <div><small>Local</small><strong id="local"></strong></div>
+      </div>
+    </section>
 
-  <div class="importante">
-    <p><b>Importante:</b></p>
-    <p>Favor confirmar o recebimento deste convite por whatsapp, telefone ou e-mail.</p>
-    <p><b>Faça arranjos para ficar até o final da reunião, pois a congregação oferecerá um lanche para o Orador e Família.</b></p>
-  </div>
-  <div class="fecho">
-    <p>Agradecemos e enviamos o nosso caloroso amor cristão.</p>
-    <p id="assinatura">Seus irmãos.</p>
+    <section class="orador">
+      <small>Orador</small>
+      <div class="nome" id="nome"></div>
+      <div class="linha"></div>
+    </section>
+
+    <nav class="atalhos" id="atalhos">
+      <a class="atalho" id="at-tel" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg><span id="at-tel-txt">Ligar</span></a>
+      <a class="atalho zap" id="at-zap" target="_blank" rel="noopener" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>WhatsApp</a>
+      <a class="atalho" id="at-mapa" target="_blank" rel="noopener" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Como chegar</a>
+    </nav>
+
+    <section class="baixo">
+      <div class="mapa" id="bloco-mapa">
+        <h2>Mapa – como chegar</h2>
+        <img id="mapa-img" src="mapa-como-chegar.png" alt="Mapa de como chegar ao Salão do Reino" onerror="window.semMapa ? semMapa() : (this.dataset.erro = '1')">
+        <div class="end" id="mapa-end"></div>
+      </div>
+      <div class="lado">
+        <div class="bloco" id="bloco-contatos" hidden>
+          <h2>Contatos</h2>
+          <div id="contatos"></div>
+        </div>
+        <div class="bloco aviso">
+          <h2>Importante</h2>
+          <p>Favor confirmar o recebimento deste convite por WhatsApp, telefone ou e-mail.</p>
+          <p><b>Faça arranjos para ficar até o final da reunião, pois a congregação oferecerá um lanche para o orador e família.</b></p>
+        </div>
+      </div>
+    </section>
+
+    <div class="fecho">
+      <p>Agradecemos e enviamos o nosso caloroso amor cristão.</p>
+      <p class="assina" id="assinatura">Seus irmãos</p>
+    </div>
   </div>
 </article>
 
 <div class="acoes" id="acoes" hidden>
-  <p class="agenda-titulo">Para ser lembrado, adicione à sua agenda:</p>
+  <p>Para ser lembrado, adicione à sua agenda:</p>
   <a class="botao" id="agenda-google" target="_blank" rel="noopener">📅 Adicionar ao Google Agenda</a>
-  <button type="button" class="botao secundario" id="agenda-ics">Outra agenda (iPhone, Outlook)</button>
-  <button type="button" class="botao secundario" onclick="window.print()">Salvar em PDF / Imprimir</button>
+  <button type="button" class="botao sec" id="agenda-ics">Outra agenda (iPhone, Outlook)</button>
+  <button type="button" class="botao sec" onclick="window.print()">Salvar em PDF / Imprimir</button>
 </div>
 <p class="invalido" id="invalido" hidden>Link de convite inválido ou incompleto. Peça um novo link a quem o enviou.</p>
 
@@ -181,15 +207,34 @@
 // Os dados vêm no "#" do link (gerado pela tela de administração) e não passam por nenhum servidor.
 // Campos: n nome, oc congregação do orador, d data, h horário, t nº tema, tt título, c congregação
 // anfitriã, e endereço, m link do mapa, ce e-mail da congregação, ct contatos, tel telefone/WhatsApp.
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const DIAS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const $ = id => document.getElementById(id);
 const semPrefixo = s => String(s || '').replace(/^congrega[cç][aã]o\s+/i, '').trim();
+// "barra do ceará" ou "BARRA DO CEARÁ" → "Barra do Ceará" (se o orador digitou misturado, mantém como está).
+const MINUSCULAS = ['da', 'das', 'de', 'do', 'dos', 'e'];
+function nomeProprio(s) {
+  if (s !== s.toLowerCase() && s !== s.toUpperCase()) return s;
+  return s.toLowerCase().split(/\s+/).map((p, i) =>
+    i > 0 && MINUSCULAS.includes(p) ? p : p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+}
 
 function ler() {
   const b64 = location.hash.slice(1).replace(/-/g, '+').replace(/_/g, '/');
   const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
+
+// Sem imagem do mapa: o rodapé fica numa coluna só.
+function semMapa() {
+  const bloco = $('bloco-mapa');
+  if (bloco) bloco.remove();
+  document.querySelector('.baixo').style.gridTemplateColumns = '1fr';
+}
+
+// A imagem pode ter falhado antes deste script carregar.
+const img = $('mapa-img');
+if (img.dataset.erro || (img.complete && !img.naturalWidth)) semMapa();
 
 try {
   const c = ler();
@@ -200,28 +245,33 @@ try {
   $('anfitria').textContent = anfitria ? `Congregação ${anfitria}` : '';
   $('endereco').textContent = c.e || '';
   $('email-cong').textContent = c.ce || '';
-  $('destinatario').innerHTML = c.oc ? 'À Congregação<br>' : '';
-  if (c.oc) $('destinatario').append(semPrefixo(c.oc));
-  $('tema').textContent = c.t ? `${c.t} – ${c.tt}` : c.tt;
-  $('data').textContent = `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${a} - ${DIAS[new Date(a, m - 1, d).getDay()]}`;
-  $('horario').textContent = c.h || '';
-  $('nome').textContent = c.n;
-  $('assinatura').textContent = anfitria ? `Seus irmãos, Congregação ${anfitria}.` : 'Seus irmãos.';
-  $('mapa-end').textContent = c.e || '';
+  if (c.oc) $('destinatario').textContent = `À Congregação ${nomeProprio(semPrefixo(c.oc))},`;
 
-  // Ícones: telefone e WhatsApp do contato da congregação; localização = link do mapa.
+  if (c.t) { $('tema-num').textContent = `Nº ${c.t}`; $('tema-num').hidden = false; }
+  $('tema-titulo').textContent = c.tt;
+  $('data').textContent = `${DIAS[new Date(a, m - 1, d).getDay()]}, ${d} de ${MESES[m - 1]} de ${a}`;
+  if (c.h) $('horario').textContent = c.h.replace(':', 'h'); else $('det-hora').remove();
+  $('local').textContent = anfitria ? `Salão do Reino — Congregação ${anfitria}` : (c.e || 'Salão do Reino');
+  $('nome').textContent = c.n;
+  $('mapa-end').textContent = c.e || '';
+  $('assinatura').textContent = anfitria ? `Seus irmãos da Congregação ${anfitria}` : 'Seus irmãos';
+
+  // Atalhos: ligar e WhatsApp (contato da congregação) e "como chegar" (link do mapa).
   const fone = String(c.tel || '').replace(/\D/g, '');
   const foneIntl = fone.length === 10 || fone.length === 11 ? '55' + fone : fone;
   if (foneIntl.length >= 12) {
-    $('ic-tel').href = 'tel:+' + foneIntl; $('ic-tel').hidden = false;
-    $('ic-zap').href = 'https://wa.me/' + foneIntl; $('ic-zap').hidden = false;
+    const local = foneIntl.slice(2);
+    $('at-tel').href = 'tel:+' + foneIntl;
+    $('at-tel-txt').textContent = `(${local.slice(0, 2)}) ${local.slice(2, -4)}-${local.slice(-4)}`;
+    $('at-zap').href = 'https://wa.me/' + foneIntl;
+    $('at-tel').hidden = $('at-zap').hidden = false;
   }
-  if (/^https:\/\//.test(c.m || '')) { $('ic-mapa').href = c.m; $('ic-mapa').hidden = false; }
-  $('icones').hidden = !document.querySelector('#icones a:not([hidden])');
+  if (/^https:\/\//.test(c.m || '')) { $('at-mapa').href = c.m; $('at-mapa').hidden = false; }
+  if (!document.querySelector('#atalhos a:not([hidden])')) $('atalhos').remove();
 
   const contatos = (Array.isArray(c.ct) ? c.ct : String(c.ct || '').split('\n')).map(s => s.trim()).filter(Boolean);
-  for (const linha of contatos) { const div = document.createElement('div'); div.textContent = linha; $('contatos').append(div); }
-  $('contatos').hidden = !contatos.length;
+  for (const linha of contatos) { const p = document.createElement('p'); p.className = 'contato'; p.textContent = linha; $('contatos').append(p); }
+  $('bloco-contatos').hidden = !contatos.length;
 
   document.title = `Convite de Orador — ${c.n} — ${d}/${m}/${a}`;
   prepararAgenda(c, anfitria);
