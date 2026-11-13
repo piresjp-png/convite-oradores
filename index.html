@@ -39,6 +39,12 @@
     box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04); margin-bottom: 16px;
   }
   .passo { display: flex; align-items: center; gap: 10px; margin: 0 0 4px; font-size: 18px; }
+  .escolhida { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--azul-claro);
+    color: var(--azul); font-weight: 600; font-size: 15px; }
+  .continuar {
+    width: 100%; margin-top: 14px; font: inherit; font-weight: 700; font-size: 16px; padding: 13px;
+    border-radius: 12px; border: 2px solid var(--azul); background: #fff; color: var(--azul); cursor: pointer;
+  }
   .passo b {
     flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--azul); color: #fff;
     display: grid; place-items: center; font-size: 14px;
@@ -163,6 +169,7 @@
       <h2 class="passo"><b>1</b> Escolha a data</h2>
       <p class="ajuda">Só aparecem as datas ainda livres. Escolha a melhor para você.</p>
       <div id="datas"></div>
+      <p class="escolhida" id="data-escolhida" hidden></p>
       <p class="msg-erro">Escolha uma data.</p>
     </section>
 
@@ -179,9 +186,10 @@
       </div>
       <div class="lista-temas" id="temas" role="group" aria-label="Lista de temas"></div>
       <p class="msg-erro">Marque pelo menos um tema.</p>
+      <button type="button" class="continuar" id="continuar">Continuar para os seus dados ↓</button>
     </section>
 
-    <section class="cartao">
+    <section class="cartao" id="bloco-dados">
       <h2 class="passo"><b>3</b> Seus dados</h2>
       <p class="ajuda">Campos com <em style="color:var(--erro);font-style:normal">*</em> são obrigatórios.</p>
       <div class="campo" id="campo-nome">
@@ -205,10 +213,10 @@
         <p class="msg-erro">Use o seu e-mail @jwpub.org.</p>
       </div>
       <div class="campo" id="campo-gmail">
-        <label class="rotulo" for="gmail">E-mail Gmail <span>(opcional)</span></label>
+        <label class="rotulo" for="gmail">E-mail pessoal <span>(opcional — Gmail, Hotmail, Outlook…)</span></label>
         <input type="email" id="gmail" inputmode="email" autocomplete="email" placeholder="seunome@gmail.com" maxlength="120">
         <p class="dica">Se informar, você recebe o convite confirmado também por e-mail, com um botão para adicionar à sua agenda e ser lembrado.</p>
-        <p class="msg-erro">Informe um endereço que termine em @gmail.com.</p>
+        <p class="msg-erro" id="erro-gmail">Confira o e-mail (ex.: seunome@gmail.com ou seunome@hotmail.com).</p>
       </div>
       <input type="text" name="site" id="site" class="isca" tabindex="-1" autocomplete="off" aria-hidden="true">
     </section>
@@ -365,7 +373,25 @@ $('temas').addEventListener('change', e => {
 });
 $('busca').addEventListener('input', desenharTemas);
 $('so-marcados').addEventListener('change', desenharTemas);
-$('datas').addEventListener('change', () => $('bloco-data').classList.remove('invalido'));
+// Guia o orador (muitos são idosos): ao escolher a data, mostra a confirmação e desce
+// sozinho para a etapa 2; o botão "Continuar" leva da etapa 2 para a 3.
+const rolarPara = el => el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+$('datas').addEventListener('change', e => {
+  $('bloco-data').classList.remove('invalido');
+  const iso = e.target.value;
+  const hora = horarios[iso] ? `, às ${horarios[iso].replace(':', 'h')}` : '';
+  $('data-escolhida').textContent = `✓ Data escolhida: ${dataPorExtenso(iso)}${hora}`;
+  $('data-escolhida').hidden = false;
+  // Pequena pausa para o orador ver a data marcada antes de a tela descer.
+  setTimeout(() => rolarPara($('bloco-temas')), 450);
+});
+$('continuar').addEventListener('click', () => {
+  if (!marcados.size) {
+    $('bloco-temas').classList.add('invalido');
+    return;
+  }
+  rolarPara($('bloco-dados'));
+});
 
 $('whatsapp').addEventListener('input', e => {
   let d = e.target.value.replace(/\D/g, '');
@@ -391,8 +417,13 @@ function validar() {
   marcar($('campo-whatsapp'), !zap || zap.length >= 10);
   const email = $('email').value.trim();
   marcar($('campo-email'), !email || /^[^\s@]+@jwpub\.org$/i.test(email));
-  const gmail = $('gmail').value.trim();
-  marcar($('campo-gmail'), !gmail || /^[a-z0-9._%+-]+@gmail\.com$/i.test(gmail));
+  // E-mail pessoal: qualquer provedor, menos jwpub.org (que tem campo próprio e não recebe e-mail de fora).
+  const pessoal = $('gmail').value.trim();
+  const jwpub = /@jwpub\.org$/i.test(pessoal);
+  $('erro-gmail').textContent = jwpub
+    ? 'Aqui vai um e-mail pessoal (Gmail, Hotmail, Outlook…). O jwpub.org fica no campo acima.'
+    : 'Confira o e-mail (ex.: seunome@gmail.com ou seunome@hotmail.com).';
+  marcar($('campo-gmail'), !pessoal || (!jwpub && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(pessoal)));
   return erros;
 }
 

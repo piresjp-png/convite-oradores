@@ -79,7 +79,8 @@
 
   /* Botões fora do convite (não saem na impressão) */
   .acoes { max-width: 200mm; margin: 0 auto 32px; padding: 0 16px; text-align: center; }
-  .acoes p { font-size: 14px; color: var(--suave); margin: 0 0 10px; }
+  .acoes p { font-size: 14px; color: var(--suave); margin: 8px 0 10px; }
+  .acoes .aviso-app { background: #fff6dc; color: #6b5200; border-radius: 10px; padding: 10px 14px; text-align: left; }
   .botao { display: inline-block; font: 700 15px var(--corpo); padding: 12px 20px; border-radius: 10px; border: 2px solid var(--azul);
     background: var(--azul); color: #fff; cursor: pointer; text-decoration: none; margin: 0 4px 10px; }
   .botao.sec { background: #fff; color: var(--azul); }
@@ -196,10 +197,14 @@
 </article>
 
 <div class="acoes" id="acoes" hidden>
+  <p class="aviso-app" id="aviso-app" hidden>Abriu pelo WhatsApp? Se o PDF não baixar, toque em <b>⋮</b> (ou em
+    <b>compartilhar</b>) e escolha <b>Abrir no navegador</b>. Depois toque de novo em “Baixar convite em PDF”.</p>
+  <button type="button" class="botao" id="baixar-pdf">📄 Baixar convite em PDF</button>
+  <button type="button" class="botao sec" onclick="window.print()">Imprimir</button>
   <p>Para ser lembrado, adicione à sua agenda:</p>
-  <a class="botao" id="agenda-google" target="_blank" rel="noopener">📅 Adicionar ao Google Agenda</a>
-  <button type="button" class="botao sec" id="agenda-ics">Outra agenda (iPhone, Outlook)</button>
-  <button type="button" class="botao sec" onclick="window.print()">Salvar em PDF / Imprimir</button>
+  <a class="botao" id="agenda-google" target="_blank" rel="noopener">📅 Google Agenda (Gmail)</a>
+  <a class="botao" id="agenda-outlook" target="_blank" rel="noopener">📅 Outlook / Hotmail</a>
+  <button type="button" class="botao sec" id="agenda-ics">Outra agenda (iPhone, Yahoo…)</button>
 </div>
 <p class="invalido" id="invalido" hidden>Link de convite inválido ou incompleto. Peça um novo link a quem o enviou.</p>
 
@@ -220,10 +225,54 @@ function nomeProprio(s) {
 }
 
 function ler() {
-  const b64 = location.hash.slice(1).replace(/-/g, '+').replace(/_/g, '/');
+  let b64 = location.hash.slice(1).replace(/-/g, '+').replace(/_/g, '/');
+  b64 += '='.repeat((4 - b64.length % 4) % 4); // o link vem sem os "=" do final
   const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
+
+/**
+ * Gera o PDF (A4) direto no aparelho, sem a janela de impressão — que não existe no navegador
+ * interno do WhatsApp. Carrega as bibliotecas só quando o botão é tocado.
+ */
+function carregarScript(src) {
+  return new Promise((ok, falha) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = ok; s.onerror = falha;
+    document.head.append(s);
+  });
+}
+async function baixarPdf(botao) {
+  const texto = botao.textContent;
+  botao.disabled = true; botao.textContent = 'Gerando PDF…';
+  try {
+    if (!window.html2canvas) await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    if (!window.jspdf) await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    await document.fonts.ready;
+    // windowWidth: desenha sempre no layout de computador (folha larga), mesmo no celular.
+    // Na cópia, a folha vai para o canto (0,0) com largura fixa; senão a captura sai deslocada.
+    const canvas = await html2canvas($('convite'), { scale: 2, windowWidth: 900, scrollX: 0, scrollY: 0, backgroundColor: '#ffffff',
+      onclone: doc => {
+        doc.body.style.margin = '0';
+        Object.assign(doc.getElementById('convite').style, { position: 'absolute', left: '0', top: '0', margin: '0',
+          width: '756px', maxWidth: '756px', boxShadow: 'none', borderRadius: '0' });
+      } });
+    const pdf = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4' });
+    const larg = 210, alt = 297, margem = 6;
+    let w = larg - 2 * margem, h = w * canvas.height / canvas.width;
+    if (h > alt - 2 * margem) { h = alt - 2 * margem; w = h * canvas.width / canvas.height; }
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', (larg - w) / 2, margem, w, h);
+    pdf.save(document.title.replace(/[\\/:*?"<>|]/g, '-') + '.pdf');
+  } catch (err) {
+    console.error(err);
+    alert('Não foi possível gerar o PDF aqui. Abra o convite no navegador (Chrome/Safari) e tente de novo, ou use “Imprimir”.');
+  } finally {
+    botao.disabled = false; botao.textContent = texto;
+  }
+}
+$('baixar-pdf').addEventListener('click', e => baixarPdf(e.currentTarget));
+// Navegador interno de apps (WhatsApp, Instagram, Facebook): download costuma ser bloqueado.
+if (/; wv\)|WhatsApp|FBAN|FBAV|Instagram/i.test(navigator.userAgent)) $('aviso-app').hidden = false;
 
 // Sem imagem do mapa: o rodapé fica numa coluna só.
 function semMapa() {
@@ -287,19 +336,25 @@ function prepararAgenda(c, congregacao) {
   const detalhes = `Tema nº ${c.t} — ${c.tt}\n\nConvite: ${location.href}`;
   const local = c.e || congregacao;
   const utc = dt => dt.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-  let datas, ini, fim;
+  let datas, ini, fim, outlook;
   if (/^\d{1,2}:\d{2}$/.test(c.h || '')) {
     // Horário de Fortaleza (UTC-3, sem horário de verão).
     const inicio = new Date(`${c.d}T${c.h.padStart(5, '0')}:00-03:00`);
     const termino = new Date(inicio.getTime() + 3600e3);
+    outlook = `&startdt=${encodeURIComponent(inicio.toISOString())}&enddt=${encodeURIComponent(termino.toISOString())}`;
     datas = `${utc(inicio)}/${utc(termino)}`;
     ini = `DTSTART:${utc(inicio)}`; fim = `DTEND:${utc(termino)}`;
   } else {
     const dia = c.d.replace(/-/g, '');
     const seguinte = new Date(Date.parse(c.d + 'T12:00:00Z') + 864e5).toISOString().slice(0, 10).replace(/-/g, '');
     datas = `${dia}/${seguinte}`;
+    outlook = `&allday=true&startdt=${c.d}&enddt=${seguinte.slice(0, 4)}-${seguinte.slice(4, 6)}-${seguinte.slice(6)}`;
     ini = `DTSTART;VALUE=DATE:${dia}`; fim = `DTEND;VALUE=DATE:${seguinte}`;
   }
+  // Outlook.com / Hotmail / Live.
+  $('agenda-outlook').href = 'https://outlook.live.com/calendar/0/action/compose?rru=addevent' +
+    `&subject=${encodeURIComponent(titulo)}${outlook}` +
+    `&body=${encodeURIComponent(detalhes)}&location=${encodeURIComponent(local)}`;
   $('agenda-google').href = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
     `&text=${encodeURIComponent(titulo)}&dates=${datas}` +
     `&details=${encodeURIComponent(detalhes)}&location=${encodeURIComponent(local)}`;
