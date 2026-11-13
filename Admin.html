@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administração — Discurso Público</title>
+<style>
+  :root {
+    --azul: #1e4f91; --azul-escuro: #173d70; --azul-claro: #e8f0fb; --azul-medio: #2f6fbf;
+    --texto: #1c2230; --suave: #5d6675; --borda: #d5dde8; --linha: #edf1f6; --fundo: #f4f6fa;
+    --amarelo: #8a6100; --amarelo-fundo: #fff4d6; --erro: #b3261e; --erro-fundo: #fcebea;
+    --roxo: #5b3f8c; --ok: #1e7a4f; --ok-fundo: #e3f4ea; --roxo-fundo: #efe9f8; --zap: #1a9e55;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fundo); color: var(--texto); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--azul-medio); }
+
+  /* Cabeçalho + menu */
+  header { background: var(--azul); color: #fff; position: sticky; top: 0; z-index: 5; }
+  .topo { max-width: 1180px; margin: auto; padding: 12px 16px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .topo h1 { margin: 0; font-size: 18px; }
+  .conta { font-size: 13px; display: flex; align-items: center; gap: 10px; opacity: .95; }
+  .conta a { color: #fff; border: 1.5px solid rgba(255,255,255,.5); border-radius: 8px; padding: 4px 10px; text-decoration: none; }
+  nav.menu { max-width: 1180px; margin: auto; padding: 8px 16px 0; display: flex; gap: 4px; overflow-x: auto; }
+  nav.menu button {
+    font: inherit; font-weight: 600; color: rgba(255,255,255,.8); background: transparent; border: 0; cursor: pointer;
+    padding: 10px 14px; border-radius: 10px 10px 0 0; white-space: nowrap; display: flex; align-items: center; gap: 6px;
+  }
+  nav.menu button.ativo { background: var(--fundo); color: var(--azul); }
+  nav.menu .qtd { background: #f2c94c; color: #3d2c00; border-radius: 99px; font-size: 12px; padding: 0 7px; }
+  main { max-width: 1180px; margin: 0 auto; padding: 16px; }
+
+  .aviso-demo { background: var(--amarelo-fundo); color: var(--amarelo); border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 14px; }
+  .erro { background: var(--erro-fundo); color: var(--erro); padding: 12px 14px; border-radius: 10px; margin-bottom: 12px; }
+  .vazio, .carregando { text-align: center; color: var(--suave); padding: 36px 16px; }
+
+  /* Selos de status */
+  .selo { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; white-space: nowrap; display: inline-block; }
+  .selo.Pendente { background: var(--amarelo-fundo); color: var(--amarelo); }
+  .selo.Confirmado { background: var(--ok-fundo); color: var(--ok); }
+  .selo.Cancelado { background: var(--erro-fundo); color: var(--erro); }
+  .selo.Substituído { background: var(--roxo-fundo); color: var(--roxo); }
+  .selo.Evento { background: #fdf0dc; color: #8a5300; }
+  .tipo-ev { display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    color: #8a5300; background: #fdf0dc; border-radius: 6px; padding: 1px 7px; margin-right: 6px; }
+  .titulo-mod { margin: 0 0 4px; font-size: 18px; }
+  .form-ev { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .form-ev label { font-size: 13px; font-weight: 600; display: flex; flex-direction: column; gap: 4px; }
+  .form-ev label small { font-weight: 400; color: var(--suave); }
+  .form-ev input, .form-ev select { font: inherit; font-weight: 400; padding: 10px 12px; border: 1.5px solid var(--borda); border-radius: 10px; background: #fff; }
+  .form-ev input:focus, .form-ev select:focus { outline: none; border-color: var(--azul-medio); }
+  .form-ev .largo { grid-column: 1 / -1; }
+  .form-ev .obr { color: var(--erro); }
+  .tema-auto { background: var(--azul-claro); border-radius: 10px; padding: 10px 12px; font-size: 15px; }
+  .tema-auto .ultima { display: block; font-size: 12px; color: var(--suave); }
+  .tema-auto .ultima.alerta { color: var(--erro); font-weight: 700; }
+  .aviso-ev { background: var(--erro-fundo); color: var(--erro); border-radius: 10px; padding: 10px 12px; margin: 0; font-size: 14px; }
+  @media (max-width: 560px) { .form-ev { grid-template-columns: 1fr; } }
+
+  /* ---------- Módulo: Discursos agendados ---------- */
+  .filtros { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+  .filtros input, .filtros select {
+    font: inherit; padding: 9px 12px; border: 1.5px solid var(--borda); border-radius: 10px; background: #fff; color: var(--texto);
+  }
+  .filtros input { flex: 1 1 220px; min-width: 0; }
+  .filtros .total { color: var(--suave); font-size: 14px; margin-left: auto; }
+  .tabela-caixa { background: #fff; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--suave); background: #fafbfd; padding: 10px 12px; border-bottom: 1px solid var(--borda); white-space: nowrap; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--linha); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  tr.passado td { color: var(--suave); }
+  td.num { font-weight: 700; color: var(--azul); font-variant-numeric: tabular-nums; }
+  td.data { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  td.data small, td .obs { display: block; color: var(--suave); font-size: 12px; }
+  .a-escolher { color: var(--amarelo); font-style: italic; }
+  tr.mes td { background: var(--azul-claro); color: var(--azul); font-weight: 700; font-size: 13px; text-transform: capitalize; padding: 6px 12px; }
+
+  @media (max-width: 760px) {
+    thead { display: none; }
+    table, tbody, tr, td { display: block; }
+    tr { padding: 10px 14px; border-bottom: 1px solid var(--borda); }
+    tr.mes { padding: 0; }
+    td { border: 0; padding: 2px 0; }
+    td[data-r]::before { content: attr(data-r) ": "; color: var(--suave); font-size: 13px; }
+    td[data-r]:empty { display: none; }
+    nav.menu .extra { display: none; }
+    td.num::before, td.tema::before, td.status::before, td.data::before { content: none !important; }
+    td.num { display: inline-block; margin-right: 6px; }
+    td.tema { display: inline; font-weight: 600; }
+    td.data { margin-top: 4px; }
+    td.status { margin-top: 6px; }
+  }
+
+  /* ---------- Módulo: Gestão de convites ---------- */
+  .abas { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; }
+  .abas button { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 99px; border: 1.5px solid var(--borda); background: #fff; color: var(--suave); cursor: pointer; white-space: nowrap; }
+  .abas button.ativa { background: var(--azul); border-color: var(--azul); color: #fff; }
+  .abas .qtd { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 4px; border-radius: 99px; background: rgba(0,0,0,.08); font-size: 12px; }
+  .abas button.ativa .qtd { background: rgba(255,255,255,.25); }
+  .gestao { max-width: 860px; }
+  .cartao { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .cab { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+  .cab .data { font-size: 17px; font-weight: 700; }
+  .cab .data span { font-weight: 400; color: var(--suave); }
+  .orador { margin: 6px 0 2px; font-size: 16px; }
+  .contato { color: var(--suave); font-size: 14px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .recebido { color: var(--suave); font-size: 12px; margin: 4px 0 0; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--suave); margin: 14px 0 6px; }
+  .temas { border: 1px solid var(--borda); border-radius: 10px; overflow: hidden; }
+  .tema-op { display: flex; gap: 10px; align-items: flex-start; padding: 9px 12px; border-bottom: 1px solid var(--linha); cursor: pointer; }
+  .tema-op:last-child { border-bottom: 0; }
+  .tema-op input { margin: 3px 0 0; accent-color: var(--azul); width: 18px; height: 18px; flex: none; }
+  .tema-op .n { font-weight: 700; color: var(--azul); min-width: 30px; }
+  .tema-op .ultima { display: block; font-size: 12px; color: var(--suave); }
+  .tema-op .ultima.alerta { color: var(--erro); font-weight: 700; }
+  .tema-op .ultima.nunca { color: var(--ok); }
+  .tema-op.escolhido { background: var(--azul-claro); }
+  textarea, .form-sub input, .form-sub select {
+    width: 100%; font: inherit; padding: 10px 12px; border: 1.5px solid var(--borda); border-radius: 10px; background: #fff;
+  }
+  textarea { resize: vertical; min-height: 44px; }
+  textarea:focus, .form-sub input:focus, .form-sub select:focus { outline: none; border-color: var(--azul-medio); }
+  .form-sub { background: var(--roxo-fundo); border-radius: 12px; padding: 14px; margin-top: 14px; }
+  .form-sub h3 { color: var(--roxo); margin-top: 0; }
+  .form-sub .grade { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-sub .grade .largo { grid-column: 1 / -1; }
+  .form-sub label { font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px; }
+  @media (max-width: 560px) { .form-sub .grade { grid-template-columns: 1fr; } }
+  .acoes { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .btn { font: inherit; font-weight: 700; padding: 10px 16px; border-radius: 10px; border: 1.5px solid transparent; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:disabled { opacity: .55; cursor: progress; }
+  .btn.prim { background: var(--azul); color: #fff; }
+  .btn.zap { background: var(--zap); color: #fff; }
+  .btn.sec { background: #fff; color: var(--azul); border-color: var(--azul); }
+  .btn.roxo { background: #fff; color: var(--roxo); border-color: #c9b8e6; }
+  .btn.roxo-cheio { background: var(--roxo); color: #fff; }
+  .btn.perigo { background: #fff; color: var(--erro); border-color: #e6b3af; }
+  .enviado { color: var(--ok); font-size: 13px; font-weight: 600; }
+  .previa { white-space: pre-wrap; background: #e9f7ef; border-radius: 10px; padding: 10px 12px; font-size: 14px; margin-top: 10px; }
+
+  @media print {
+    header, .filtros, .aviso-demo, #gestao { display: none !important; }
+    body { background: #fff; }
+    .tabela-caixa { box-shadow: none; }
+    main { padding: 0; }
+  }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div class="topo">
+    <h1>Discurso Público — Administração</h1>
+    <div class="conta"><span id="usuario"></span><a href="https://accounts.google.com/Logout" id="sair">Sair</a></div>
+  </div>
+  <nav class="menu" aria-label="Módulos">
+    <button type="button" data-modulo="discursos" class="ativo" onclick="abrirModulo('discursos')">📋 Discursos <span class="extra">agendados</span></button>
+    <button type="button" data-modulo="gestao" onclick="abrirModulo('gestao')">✅ Gestão <span class="extra">de convites</span> <span class="qtd" id="qtd-pendentes" hidden></span></button>
+    <button type="button" data-modulo="evento" onclick="abrirModulo('evento')">➕ Novo <span class="extra">evento</span></button>
+  </nav>
+</header>
+
+<main>
+  <div id="aviso-demo" class="aviso-demo" hidden><strong>Modo demonstração:</strong> nada é gravado. Na versão publicada, o acesso exige login com uma conta Google autorizada.</div>
+  <div id="erro" class="erro" hidden></div>
+  <p id="carregando" class="carregando">Carregando…</p>
+
+  <!-- Módulo 1: Discursos agendados -->
+  <section id="discursos" hidden>
+    <div class="filtros">
+      <input type="search" id="f-busca" placeholder="Buscar orador, congregação, tema ou nº" oninput="desenharDiscursos()">
+      <select id="f-periodo" onchange="desenharDiscursos()" aria-label="Período"></select>
+      <select id="f-status" onchange="desenharDiscursos()" aria-label="Status">
+        <option value="">Todos os status</option>
+        <option>Confirmado</option><option>Evento</option><option>Pendente</option><option>Substituído</option><option>Cancelado</option>
+      </select>
+      <button type="button" class="btn sec" onclick="window.print()">Imprimir</button>
+      <span class="total" id="f-total"></span>
+    </div>
+    <div class="tabela-caixa">
+      <table>
+        <thead><tr><th>Nº</th><th>Tema</th><th>Data</th><th>Orador</th><th>Congregação</th><th>WhatsApp</th><th>E-mail</th><th>Status</th></tr></thead>
+        <tbody id="tabela"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Módulo 2: Gestão de convites -->
+  <section id="gestao" class="gestao" hidden>
+    <nav class="abas" id="abas"></nav>
+    <div id="lista"></div>
+  </section>
+
+  <!-- Módulo 3: Novo evento (discurso designado ou evento especial) -->
+  <section id="evento" class="gestao" hidden>
+    <div class="cartao">
+      <h2 class="titulo-mod">Cadastrar no calendário</h2>
+      <p class="recebido" style="font-size:14px">Para designar um orador diretamente (sem o link de inscrição) ou registrar
+        assembleias, congresso, discursos especiais e reuniões especiais. Eventos bloqueiam a data para os oradores.</p>
+      <div class="form-ev">
+        <label class="largo">Tipo <select id="ev-tipo" onchange="atualizarFormEvento()"></select></label>
+        <label>Data <span class="obr">*</span><input id="ev-data" type="date" onchange="atualizarFormEvento()"></label>
+        <label>Horário <small>(em branco = horário da reunião nessa data)</small><input id="ev-hora" type="time"></label>
+        <p class="aviso-ev largo" id="ev-conflito" hidden></p>
+
+        <label class="so-dp">Nº do tema <span class="obr">*</span><input id="ev-num" type="number" min="1" inputmode="numeric" oninput="atualizarFormEvento()"></label>
+        <div class="so-dp tema-auto" id="ev-tema">Digite o número para ver o tema.</div>
+
+        <label class="so-ev largo">Título / descrição <input id="ev-titulo" maxlength="200"></label>
+
+        <label class="com-orador">Orador <span class="obr so-dp">*</span><input id="ev-nome" maxlength="120"></label>
+        <label class="com-orador">Congregação <span class="obr so-dp">*</span><input id="ev-cong" maxlength="120"></label>
+        <label class="com-orador">WhatsApp<input id="ev-zap" type="tel" placeholder="(85) 99999-9999" maxlength="20"></label>
+        <label class="so-dp">E-mail (jwpub.org)<input id="ev-email" type="email" maxlength="120"></label>
+        <label class="so-dp">E-mail pessoal <small>(Gmail, Hotmail… recebe o convite)</small><input id="ev-gmail" type="email" maxlength="120"></label>
+        <label class="so-dp">Hospitalidade<input id="ev-hosp" maxlength="300"></label>
+        <label class="largo">Observação <small>(opcional)</small><input id="ev-obs" maxlength="300"></label>
+      </div>
+      <div class="acoes">
+        <button type="button" class="btn prim" onclick="salvarEvento(this)">Salvar no calendário</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const ABAS = [
+  { chave: 'Pendente', nome: 'Pendentes', status: ['Pendente'] },
+  { chave: 'Confirmado', nome: 'Confirmados', status: ['Confirmado'] },
+  { chave: 'Encerrado', nome: 'Cancelados e substituídos', status: ['Cancelado', 'Substituído'] },
+];
+const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const MESES_LONGO = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const DIAS = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+const DIAS_CURTO = ['dom','seg','ter','qua','qui','sex','sáb'];
+
+let estado = { inscricoes: [], ultimas: {}, catalogo: [] };
+let moduloAtual = 'discursos';
+let abaAtual = 'Pendente';
+// Endereços ficam em strings comuns: o Apps Script corta o que vem depois de duas barras
+// dentro de template literals (crase), achando que é comentário, e quebra a página inteira.
+const BARRAS = '/' + '/';
+const URL_WA = 'https:' + BARRAS + 'wa.me/';
+const URL_WA_ENVIAR = 'https:' + BARRAS + 'api.whatsapp.com/send?phone=';
+const MAPA_DEMO = 'https:' + BARRAS + 'maps.app.goo.gl/5PfpVtjNya3MWx7v9';
+const mensagens = {};   // id → {texto, linkWhatsApp, linkConvite}
+const substituindo = new Set();
+
+// ------------------------------------------------------------- servidor
+// Dentro do Apps Script usa google.script.run; aberto direto no navegador usa dados de demonstração.
+const DEMO = typeof google === 'undefined' || !google.script;
+function servidor(funcao, ...args) {
+  if (DEMO) return demo(funcao, args);
+  return new Promise((ok, falha) => {
+    // Com várias contas Google logadas no mesmo navegador, o google.script.run às vezes
+    // nunca responde. Em vez de ficar "Carregando…" para sempre, avisa o que fazer.
+    const limite = setTimeout(() => falha(new Error(
+      'O servidor não respondeu. Se houver mais de uma conta Google conectada neste navegador, ' +
+      'abra este link numa janela anônima (Ctrl+Shift+N) ou num perfil do Chrome só com a conta autorizada.'
+    )), 30000);
+    google.script.run
+      .withSuccessHandler(v => { clearTimeout(limite); v == null && funcao === 'adminListar'
+        ? falha(new Error('O servidor devolveu uma resposta vazia.')) : ok(v); })
+      .withFailureHandler(e => { clearTimeout(limite); falha(e); })[funcao](...args);
+  });
+}
+
+// ------------------------------------------------------------- utilitários
+const $ = id => document.getElementById(id);
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+function semAcento(s) { return String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+function paraData(iso) { const [a, m, d] = iso.split('-').map(Number); return new Date(a, m - 1, d); }
+function dataLonga(iso) {
+  if (!iso) return '(sem data)';
+  const d = paraData(iso);
+  return `${DIAS[d.getDay()]}, ${d.getDate()} ${MESES[d.getMonth()]} ${d.getFullYear()}`;
+}
+function dataCurta(iso) { return iso ? iso.split('-').reverse().join('/') : ''; }
+function hojeIso() { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); }
+function foneWa(v) { let d = String(v || '').replace(/\D/g, '').replace(/^0+/, ''); if (d.length === 10 || d.length === 11) d = '55' + d; return d.length >= 12 ? d : ''; }
+
+// ------------------------------------------------------------- regra dos 6 meses
+// Um tema só deve ser repetido depois de 6 meses. Olha os discursos confirmados (inclusive o
+// histórico importado) antes e depois da data em análise, ignorando a própria inscrição.
+const MESES_ENTRE_REPETICOES = 6;
+function mesesEntre(a, b) { return Math.abs(paraData(a) - paraData(b)) / (864e5 * 30.44); }
+function historicoTema(numero, dataRef, idIgnorar) {
+  const datas = estado.inscricoes
+    .filter(x => x.status === 'Confirmado' && x.temaEscolhido === numero && x.id !== idIgnorar && x.data)
+    .map(x => x.data).sort();
+  const anterior = datas.filter(d => d <= dataRef).pop() || '';
+  const posterior = datas.find(d => d > dataRef) || '';
+  const perto = [anterior, posterior].filter(d => d && mesesEntre(d, dataRef) < MESES_ENTRE_REPETICOES);
+  return { anterior, posterior, alerta: perto.length > 0, perto };
+}
+function textoMeses(a, b) {
+  const m = Math.round(mesesEntre(a, b));
+  return m < 1 ? 'menos de 1 mês' : m === 1 ? '1 mês' : `${m} meses`;
+}
+/** HTML do aviso mostrado abaixo de cada tema na hora de escolher. */
+function avisoTema(numero, dataRef, idIgnorar) {
+  const h = historicoTema(numero, dataRef, idIgnorar);
+  const partes = [];
+  if (h.anterior) partes.push(`Último: ${dataCurta(h.anterior)} (${textoMeses(h.anterior, dataRef)} antes)`);
+  if (h.posterior) partes.push(`Já agendado: ${dataCurta(h.posterior)} (${textoMeses(h.posterior, dataRef)} depois)`);
+  if (!partes.length) return '<span class="ultima nunca">Sem registro anterior</span>';
+  return `<span class="ultima ${h.alerta ? 'alerta' : ''}">${h.alerta ? '⚠ Menos de 6 meses — ' : ''}${partes.join(' · ')}</span>`;
+}
+/** Pede confirmação extra quando o tema fere a regra dos 6 meses. */
+function confirmarRegra(numero, dataRef, idIgnorar) {
+  const h = historicoTema(numero, dataRef, idIgnorar);
+  if (!h.alerta) return true;
+  const quando = h.perto.map(d => `${dataLonga(d)} (${textoMeses(d, dataRef)} de diferença)`).join('\n');
+  return confirm(`Atenção: o tema nº ${numero} também está em:\n${quando}\n\nA regra é esperar ${MESES_ENTRE_REPETICOES} meses entre apresentações do mesmo tema. Confirmar mesmo assim?`);
+}
+
+function mostrarErro(err) {
+  $('erro').textContent = (err && err.message) || String(err);
+  $('erro').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function carregar() {
+  $('erro').hidden = true;
+  try {
+    estado = await servidor('adminListar');
+    $('usuario').textContent = estado.usuario || '';
+    $('aviso-demo').hidden = !DEMO;
+    $('carregando').hidden = true;
+    montarFiltroPeriodo();
+    desenharTudo();
+  } catch (err) {
+    $('carregando').hidden = true;
+    mostrarErro(err);
+  }
+}
+
+function abrirModulo(nome) {
+  moduloAtual = nome;
+  document.querySelectorAll('nav.menu button').forEach(b => b.classList.toggle('ativo', b.dataset.modulo === nome));
+  desenharTudo();
+  window.scrollTo({ top: 0 });
+}
+
+function desenharTudo() {
+  $('discursos').hidden = moduloAtual !== 'discursos';
+  $('gestao').hidden = moduloAtual !== 'gestao';
+  $('evento').hidden = moduloAtual !== 'evento';
+  const pend = estado.inscricoes.filter(x => x.status === 'Pendente').length;
+  $('qtd-pendentes').textContent = pend;
+  $('qtd-pendentes').hidden = !pend;
+  if (moduloAtual === 'discursos') desenharDiscursos();
+  else if (moduloAtual === 'gestao') desenharGestao();
+  else prepararFormEvento();
+}
+
+// ============================================================= Discursos agendados
+function montarFiltroPeriodo() {
+  const sel = $('f-periodo');
+  const atual = sel.value || 'proximos';
+  const anos = [...new Set(estado.inscricoes.map(x => x.data.slice(0, 4)).filter(Boolean))].sort().reverse();
+  sel.innerHTML = '<option value="proximos">Próximos</option><option value="todos">Todos</option>' +
+    anos.map(a => `<option value="${a}">${a}</option>`).join('');
+  sel.value = [...sel.options].some(o => o.value === atual) ? atual : 'proximos';
+}
+
+function desenharDiscursos() {
+  const hoje = hojeIso();
+  const periodo = $('f-periodo').value || 'proximos';
+  const status = $('f-status').value;
+  const termo = semAcento($('f-busca').value.trim());
+
+  const lista = estado.inscricoes.filter(x => {
+    if (periodo === 'proximos' && x.data < hoje) return false;
+    if (/^\d{4}$/.test(periodo) && !x.data.startsWith(periodo)) return false;
+    if (status && statusVisivel(x) !== status) return false;
+    if (termo) {
+      const alvo = semAcento([x.nome, x.congregacao, x.temaTexto, x.temaEscolhido, x.whatsapp, x.email].join(' '));
+      if (!alvo.includes(termo)) return false;
+    }
+    return true;
+  });
+  // Próximos: do mais perto para o mais longe. Histórico: do mais recente para o mais antigo.
+  if (periodo !== 'proximos') lista.reverse();
+
+  $('f-total').textContent = lista.length === 1 ? '1 discurso' : `${lista.length} discursos`;
+  if (!lista.length) {
+    $('tabela').innerHTML = `<tr><td colspan="8" class="vazio">Nenhum discurso encontrado.</td></tr>`;
+    return;
+  }
+  let mesAnterior = '';
+  $('tabela').innerHTML = lista.map(x => {
+    const mes = x.data.slice(0, 7);
+    let cab = '';
+    if (mes !== mesAnterior) {
+      mesAnterior = mes;
+      const [a, m] = mes.split('-').map(Number);
+      cab = `<tr class="mes"><td colspan="8">${MESES_LONGO[m - 1]} ${a}</td></tr>`;
+    }
+    const d = paraData(x.data);
+    const tema = x.status === 'Pendente'
+      ? `<span class="a-escolher">A escolher</span><span class="obs">Marcou: ${x.temas.map(t => t.numero).join(', ')}</span>`
+      : (ehEvento(x) ? `<span class="tipo-ev">${esc(x.tipo)}</span>` : '') +
+        (ehEvento(x) && x.temaTexto === x.tipo ? '' : esc(x.temaTexto || '—'));
+    const wa = foneWa(x.whatsapp);
+    return cab + `<tr class="${x.data < hoje ? 'passado' : ''}">
+      <td class="num">${x.status === 'Pendente' ? '' : esc(x.temaEscolhido ?? '')}</td>
+      <td class="tema">${tema}${x.obs && !/^(Importado|Cadastrado manualmente)/.test(x.obs) ? `<span class="obs">${esc(x.obs)}</span>` : ''}</td>
+      <td class="data">${dataCurta(x.data)} <small>${DIAS_CURTO[d.getDay()]}${x.horario ? ' · ' + esc(x.horario) : ''}</small></td>
+      <td data-r="Orador">${esc(x.nome)}</td>
+      <td data-r="Congregação">${esc(x.congregacao)}</td>
+      <td data-r="WhatsApp">${wa ? `<a href="${URL_WA}${wa}" target="_blank" rel="noopener">${esc(x.whatsapp)}</a>` : esc(x.whatsapp)}</td>
+      <td data-r="E-mail">${[x.email, x.gmail].filter(Boolean).map(e => `<a href="mailto:${esc(e)}">${esc(e)}</a>`).join('<br>')}</td>
+      <td class="status"><span class="selo ${esc(statusVisivel(x))}">${esc(statusVisivel(x))}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ============================================================= Gestão de convites
+function desenharGestao() {
+  const hoje = hojeIso();
+  const daAba = aba => estado.inscricoes.filter(x => aba.status.includes(x.status) && (aba.chave === 'Pendente' || x.data >= hoje));
+  $('abas').innerHTML = ABAS.map(a =>
+    `<button type="button" class="${a.chave === abaAtual ? 'ativa' : ''}" onclick="trocarAba('${a.chave}')">${a.nome}<span class="qtd">${daAba(a).length}</span></button>`
+  ).join('');
+  const lista = daAba(ABAS.find(a => a.chave === abaAtual));
+  $('lista').innerHTML = lista.length
+    ? lista.map(cartao).join('')
+    : `<p class="vazio">${abaAtual === 'Pendente' ? 'Nenhuma inscrição aguardando conferência.' : 'Nada por aqui (só datas futuras aparecem).'}</p>`;
+}
+
+function trocarAba(chave) { abaAtual = chave; desenharGestao(); }
+
+// ============================================================= Novo evento
+const TIPO_DISCURSO = 'Discurso público';
+const TIPOS_PADRAO = [TIPO_DISCURSO, 'Discurso especial', 'Assembleia de circuito', 'Congresso regional',
+  'Reunião especial (Corpo Governante)', 'Visita do superintendente de circuito', 'Outro evento'];
+// Tipos sem orador próprio (o programa é da assembleia/congresso).
+const SEM_ORADOR = ['Assembleia de circuito', 'Congresso regional'];
+const EXEMPLO_TITULO = {
+  'Discurso especial': 'Ex.: Quem vai salvar o nosso planeta?',
+  'Assembleia de circuito': 'Ex.: Assembleia de Circuito com o Representante de Betel',
+  'Congresso regional': 'Ex.: Congresso — Felicidade Eterna',
+  'Reunião especial (Corpo Governante)': 'Ex.: Reunião especial com membro do Corpo Governante',
+  'Visita do superintendente de circuito': 'Ex.: Visita do Superintendente — tema do discurso',
+};
+
+function prepararFormEvento() {
+  const sel = $('ev-tipo');
+  if (!sel.options.length) {
+    sel.innerHTML = (estado.tipos || TIPOS_PADRAO).map(t => `<option>${esc(t)}</option>`).join('');
+  }
+  atualizarFormEvento();
+}
+
+function atualizarFormEvento() {
+  const tipo = $('ev-tipo').value;
+  const dp = tipo === TIPO_DISCURSO;
+  document.querySelectorAll('#evento .so-dp').forEach(el => { el.hidden = !dp; });
+  document.querySelectorAll('#evento .so-ev').forEach(el => { el.hidden = dp; });
+  document.querySelectorAll('#evento .com-orador').forEach(el => { el.hidden = SEM_ORADOR.includes(tipo); });
+  $('ev-titulo').placeholder = EXEMPLO_TITULO[tipo] || '';
+
+  // Data já ocupada por outra inscrição ou evento?
+  const data = $('ev-data').value;
+  const ocupada = data && estado.inscricoes.find(x => x.data === data && (x.status === 'Pendente' || x.status === 'Confirmado'));
+  $('ev-conflito').hidden = !ocupada;
+  if (ocupada) {
+    $('ev-conflito').textContent = `Atenção: ${dataLonga(data)} já tem ${ehEvento(ocupada) ? ocupada.tipo : 'discurso de ' + ocupada.nome} (${statusVisivel(ocupada)}). Cancele na Gestão antes de cadastrar outro.`;
+  }
+
+  // Tema pelo número + regra dos 6 meses.
+  if (dp) {
+    const n = Number($('ev-num').value);
+    const t = estado.catalogo.find(c => c.numero === n);
+    $('ev-tema').innerHTML = !$('ev-num').value ? 'Digite o número para ver o tema.'
+      : !t ? '<span style="color:var(--erro)">Não há tema com esse número.</span>'
+      : `<strong>${t.numero} — ${esc(t.titulo)}</strong>${data ? avisoTema(t.numero, data, '') : ''}`;
+  }
+}
+
+function salvarEvento(botao) {
+  const tipo = $('ev-tipo').value;
+  const dp = tipo === TIPO_DISCURSO;
+  const dados = {
+    tipo,
+    data: $('ev-data').value,
+    horario: $('ev-hora').value,
+    tema: dp ? Number($('ev-num').value) : '',
+    titulo: dp ? '' : $('ev-titulo').value.trim(),
+    nome: SEM_ORADOR.includes(tipo) ? '' : $('ev-nome').value.trim(),
+    congregacao: SEM_ORADOR.includes(tipo) ? '' : $('ev-cong').value.trim(),
+    whatsapp: SEM_ORADOR.includes(tipo) ? '' : $('ev-zap').value.trim(),
+    email: dp ? $('ev-email').value.trim().toLowerCase() : '',
+    gmail: dp ? $('ev-gmail').value.trim().toLowerCase() : '',
+    hospitalidade: dp ? $('ev-hosp').value.trim() : '',
+    obs: $('ev-obs').value.trim(),
+  };
+  if (!dados.data) return mostrarErro('Informe a data.');
+  if (dp) {
+    if (!estado.catalogo.some(c => c.numero === dados.tema)) return mostrarErro('Informe um número de tema válido.');
+    if (!dados.nome || !dados.congregacao) return mostrarErro('Informe o orador e a congregação.');
+    if (!confirmarRegra(dados.tema, dados.data, '')) return;
+  }
+  ocupado(botao, async () => {
+    const r = await servidor('adminCriarEvento', dados);
+    if (r.mensagem) mensagens[r.id] = r.mensagem;
+    document.querySelectorAll('#evento input').forEach(i => { i.value = ''; });
+    botao.disabled = false; botao.textContent = 'Salvar no calendário';
+    await carregar();
+    // Discurso: vai para a Gestão (para enviar o convite pelo WhatsApp). Evento: para o calendário.
+    if (dp) { abaAtual = 'Confirmado'; abrirModulo('gestao'); } else { $('f-periodo').value = 'todos'; abrirModulo('discursos'); }
+    const novo = $('c-' + r.id);
+    if (novo) novo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
+function ehEvento(x) { return !!x.tipo && x.tipo !== TIPO_DISCURSO; }
+// Eventos confirmados aparecem como "Evento" (o status real continua Confirmado/Cancelado).
+function statusVisivel(x) { return ehEvento(x) && x.status === 'Confirmado' ? 'Evento' : x.status; }
+
+function cartaoEvento(x) {
+  return `<article class="cartao" id="c-${x.id}">
+    <div class="cab">
+      <div class="data">${dataLonga(x.data)} ${x.horario ? `<span>· ${esc(x.horario)}</span>` : ''}</div>
+      <span class="selo ${esc(statusVisivel(x))}">${esc(statusVisivel(x))}</span>
+    </div>
+    <p class="orador"><span class="tipo-ev">${esc(x.tipo)}</span>${x.temaTexto !== x.tipo ? `<strong>${esc(x.temaTexto)}</strong>` : ''}</p>
+    ${x.nome ? `<p class="recebido" style="font-size:14px">Orador: ${esc(x.nome)}${x.congregacao ? ' · ' + esc(x.congregacao) : ''}</p>` : ''}
+    ${x.obs && x.obs !== 'Cadastrado manualmente' ? `<p class="recebido" style="font-size:14px">${esc(x.obs)}</p>` : ''}
+    ${x.confirmadoPor ? `<p class="recebido">Cadastrado${x.confirmadoEm ? ' em ' + esc(x.confirmadoEm) : ''} por ${esc(x.confirmadoPor)}</p>` : ''}
+    ${x.status === 'Confirmado' ? `<div class="acoes"><button type="button" class="btn perigo" onclick="cancelar('${x.id}', this)">Cancelar evento e liberar data</button></div>` : ''}
+  </article>`;
+}
+
+function cartao(x) {
+  if (ehEvento(x)) return cartaoEvento(x);
+  const wa = foneWa(x.whatsapp);
+  const contato = [
+    x.whatsapp ? (wa ? `<a href="${URL_WA}${wa}" target="_blank" rel="noopener">WhatsApp ${esc(x.whatsapp)}</a>` : esc(x.whatsapp)) : '<span>sem WhatsApp</span>',
+    x.email ? `<a href="mailto:${esc(x.email)}">${esc(x.email)}</a>` : '',
+    x.gmail ? `<a href="mailto:${esc(x.gmail)}">${esc(x.gmail)}</a>` : '',
+  ].filter(Boolean).join('');
+
+  let corpo = '';
+  if (x.status === 'Pendente') {
+    const temas = x.temas.map(t =>
+      `<label class="tema-op"><input type="radio" name="tema-${x.id}" value="${t.numero}" onchange="marcarTema(this)">
+        <span class="n">${t.numero}</span><span>${esc(t.titulo)}${avisoTema(t.numero, x.data, x.id)}</span></label>`
+    ).join('');
+    corpo = `
+      <h3>Temas preparados — escolha um <span style="text-transform:none;letter-spacing:0">(regra: 6 meses entre repetições)</span></h3>
+      <div class="temas">${temas}</div>
+      <h3>Hospitalidade <span style="text-transform:none;letter-spacing:0">(opcional, vai na mensagem)</span></h3>
+      <textarea id="hosp-${x.id}" rows="2" placeholder="Ex.: Família Silva">${esc(x.hospitalidade)}</textarea>
+      <div class="acoes">
+        <button type="button" class="btn prim" onclick="confirmar('${x.id}', this)">✓ Confirmar</button>
+        <button type="button" class="btn roxo" onclick="alternarSubstituir('${x.id}')">⇄ Substituir orador</button>
+        <button type="button" class="btn perigo" onclick="cancelar('${x.id}', this)">Cancelar e liberar data</button>
+      </div>`;
+  } else if (x.status === 'Confirmado') {
+    const m = mensagens[x.id];
+    corpo = `
+      <h3>Tema</h3>
+      <div class="temas"><div class="tema-op escolhido"><span class="n">${esc(x.temaEscolhido ?? '')}</span><span>${esc(x.temaTexto)}</span></div></div>
+      ${x.hospitalidade ? `<p class="recebido" style="font-size:14px;color:var(--texto)"><strong>Hospitalidade:</strong> ${esc(x.hospitalidade)}</p>` : ''}
+      ${m ? `<div class="previa">${esc(m.texto)}</div>` : ''}
+      <div class="acoes">
+        ${m ? botoesEnvio(x, m) : `<button type="button" class="btn zap" onclick="prepararMensagem('${x.id}', this)">Preparar mensagem do WhatsApp</button>`}
+        ${x.gmail ? `<button type="button" class="btn sec" onclick="enviarEmail('${x.id}', this)">✉ Enviar convite por e-mail</button>` : ''}
+        <button type="button" class="btn roxo" onclick="alternarSubstituir('${x.id}')">⇄ Substituir orador</button>
+        <button type="button" class="btn perigo" onclick="cancelar('${x.id}', this)">Cancelar</button>
+      </div>
+      ${x.convite === 'Enviado' ? '<p class="enviado">✓ Convite enviado pelo WhatsApp</p>' : ''}
+      ${m && m.email ? `<p class="enviado">✉ Convite enviado por e-mail para ${esc(m.email)}</p>` : ''}
+      ${x.confirmadoPor || x.confirmadoEm ? `<p class="recebido">Confirmado${x.confirmadoEm ? ' em ' + esc(x.confirmadoEm) : ''}${x.confirmadoPor ? ' por ' + esc(x.confirmadoPor) : ''}</p>` : ''}`;
+  } else {
+    corpo = `${x.temaTexto ? `<p class="recebido" style="font-size:14px">Tema: ${esc(x.temaEscolhido ?? '')} ${esc(x.temaTexto)}</p>` : ''}
+      ${x.obs ? `<p class="recebido" style="font-size:14px">${esc(x.obs)}</p>` : ''}`;
+  }
+
+  return `<article class="cartao" id="c-${x.id}">
+    <div class="cab">
+      <div class="data">${dataLonga(x.data)} ${x.horario ? `<span>· ${esc(x.horario)}</span>` : ''}</div>
+      <span class="selo ${esc(x.status)}">${esc(x.status)}</span>
+    </div>
+    <p class="orador"><strong>${esc(x.nome)}</strong> · ${esc(x.congregacao)}</p>
+    <div class="contato">${contato}</div>
+    ${x.recebido ? `<p class="recebido">Inscrito em ${esc(x.recebido)}</p>` : ''}
+    ${x.obs && x.status === 'Confirmado' && !x.obs.startsWith('Importado') ? `<p class="recebido">${esc(x.obs)}</p>` : ''}
+    ${corpo}
+    ${substituindo.has(x.id) ? formSubstituir(x) : ''}
+  </article>`;
+}
+
+function formSubstituir(x) {
+  const opcoes = estado.catalogo.map(t => {
+    const h = historicoTema(t.numero, x.data, x.id);
+    const info = h.anterior ? ` (último: ${dataCurta(h.anterior)})` : '';
+    return `<option value="${t.numero}">${h.alerta ? '⚠ ' : ''}${t.numero} — ${esc(t.titulo)}${info}</option>`;
+  }).join('');
+  return `<div class="form-sub">
+    <h3>Substituir ${esc(x.nome)} em ${dataLonga(x.data)}</h3>
+    <div class="grade">
+      <div><label for="s-nome-${x.id}">Nome e sobrenome *</label><input id="s-nome-${x.id}" maxlength="120"></div>
+      <div><label for="s-cong-${x.id}">Congregação *</label><input id="s-cong-${x.id}" maxlength="120"></div>
+      <div><label for="s-zap-${x.id}">WhatsApp</label><input id="s-zap-${x.id}" type="tel" placeholder="(85) 99999-9999" maxlength="20"></div>
+      <div><label for="s-email-${x.id}">E-mail</label><input id="s-email-${x.id}" type="email" placeholder="nome@jwpub.org" maxlength="120"></div>
+      <div class="largo"><label for="s-gmail-${x.id}">E-mail pessoal: Gmail, Hotmail, Outlook… (recebe o convite e o lembrete da agenda)</label><input id="s-gmail-${x.id}" type="email" placeholder="nome@gmail.com ou nome@hotmail.com" maxlength="120"></div>
+      <div class="largo"><label for="s-tema-${x.id}">Tema *</label>
+        <select id="s-tema-${x.id}"><option value="">Escolha o tema…</option>${opcoes}</select>
+        <span class="recebido">⚠ = tema apresentado há menos de 6 meses (ou agendado nos próximos 6 meses)</span></div>
+    </div>
+    <div class="acoes">
+      <button type="button" class="btn roxo-cheio" onclick="substituir('${x.id}', this)">Confirmar substituição</button>
+      <button type="button" class="btn sec" onclick="alternarSubstituir('${x.id}')">Fechar</button>
+    </div>
+  </div>`;
+}
+
+function botoesEnvio(x, m) {
+  const zap = m.linkWhatsApp
+    ? `<a class="btn zap" href="${esc(m.linkWhatsApp)}" target="_blank" rel="noopener" onclick="marcarEnviado('${x.id}')">Enviar pelo WhatsApp</a>`
+    : `<button type="button" class="btn zap" onclick="copiar('${x.id}', this)">Copiar mensagem</button>`;
+  const convite = m.linkConvite ? `<a class="btn sec" href="${esc(m.linkConvite)}" target="_blank" rel="noopener">Ver convite</a>` : '';
+  return zap + convite;
+}
+
+function marcarTema(input) {
+  input.closest('.temas').querySelectorAll('.tema-op').forEach(l => l.classList.toggle('escolhido', l.contains(input)));
+}
+
+async function ocupado(botao, fn) {
+  const texto = botao.textContent;
+  botao.disabled = true; botao.textContent = 'Aguarde…';
+  try { await fn(); } catch (err) { mostrarErro(err); botao.disabled = false; botao.textContent = texto; }
+}
+
+function confirmar(id, botao) {
+  const marcado = document.querySelector(`input[name="tema-${id}"]:checked`);
+  if (!marcado) return mostrarErro('Escolha um dos temas antes de confirmar.');
+  const x0 = estado.inscricoes.find(i => i.id === id);
+  if (!confirmarRegra(Number(marcado.value), x0.data, id)) return;
+  const hosp = $('hosp-' + id).value.trim();
+  ocupado(botao, async () => {
+    mensagens[id] = await servidor('adminConfirmar', id, Number(marcado.value), hosp);
+    const x = estado.inscricoes.find(i => i.id === id);
+    const t = x.temas.find(t => t.numero === Number(marcado.value));
+    const agora = new Date();
+    const confirmadoEm = agora.toLocaleDateString('pt-BR') + ' ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    Object.assign(x, { status: 'Confirmado', temaEscolhido: t.numero, temaTexto: t.titulo, hospitalidade: hosp,
+      confirmadoPor: estado.usuario, confirmadoEm });
+    abaAtual = 'Confirmado';
+    $('erro').hidden = true;
+    desenharTudo();
+  });
+}
+
+function alternarSubstituir(id) {
+  substituindo.has(id) ? substituindo.delete(id) : substituindo.add(id);
+  desenharGestao();
+  if (substituindo.has(id)) $('s-nome-' + id).focus();
+}
+
+function substituir(id, botao) {
+  const dados = {
+    nome: $('s-nome-' + id).value.trim(),
+    congregacao: $('s-cong-' + id).value.trim(),
+    whatsapp: $('s-zap-' + id).value.trim(),
+    email: $('s-email-' + id).value.trim().toLowerCase(),
+    gmail: $('s-gmail-' + id).value.trim().toLowerCase(),
+    tema: Number($('s-tema-' + id).value),
+  };
+  if (dados.nome.split(/\s+/).length < 2) return mostrarErro('Informe nome e sobrenome do substituto.');
+  if (!dados.congregacao) return mostrarErro('Informe a congregação do substituto.');
+  if (!dados.tema) return mostrarErro('Escolha o tema do substituto.');
+  if (dados.gmail && (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(dados.gmail) || /@jwpub\.org$/.test(dados.gmail))) return mostrarErro('Confira o e-mail pessoal do substituto (Gmail, Hotmail, Outlook…). O jwpub.org vai no campo E-mail.');
+  const x = estado.inscricoes.find(i => i.id === id);
+  if (!confirmarRegra(dados.tema, x.data, id)) return;
+  if (!confirm(`Substituir ${x.nome} por ${dados.nome} em ${dataLonga(x.data)}?`)) return;
+  ocupado(botao, async () => {
+    const r = await servidor('adminSubstituir', id, dados);
+    substituindo.delete(id);
+    mensagens[r.id] = r.mensagem;
+    await carregar();
+    abaAtual = 'Confirmado';
+    desenharTudo();
+    const novo = $('c-' + r.id);
+    if (novo) novo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
+function prepararMensagem(id, botao) {
+  ocupado(botao, async () => { mensagens[id] = await servidor('adminMensagem', id); desenharGestao(); });
+}
+
+function enviarEmail(id, botao) {
+  ocupado(botao, async () => {
+    const para = await servidor('adminEnviarEmail', id);
+    mensagens[id] = Object.assign(mensagens[id] || await servidor('adminMensagem', id), { email: para });
+    desenharGestao();
+  });
+}
+
+function marcarEnviado(id) {
+  estado.inscricoes.find(i => i.id === id).convite = 'Enviado';
+  servidor('adminMarcarEnviado', id).then(desenharGestao, mostrarErro);
+}
+
+function copiar(id, botao) {
+  navigator.clipboard.writeText(mensagens[id].texto).then(() => {
+    botao.textContent = 'Copiado ✓';
+    marcarEnviado(id);
+  }, () => mostrarErro('Não foi possível copiar. Selecione o texto da mensagem e copie manualmente.'));
+}
+
+function cancelar(id, botao) {
+  const x = estado.inscricoes.find(i => i.id === id);
+  if (!confirm(`Cancelar a inscrição de ${x.nome} em ${dataLonga(x.data)}?\nA data volta a ficar disponível para outros oradores.`)) return;
+  ocupado(botao, async () => { await servidor('adminCancelar', id); x.status = 'Cancelado'; desenharTudo(); });
+}
+
+// ============================================================= modo demonstração
+// Usa planilha/dados_demo.json (gerado por ferramentas/gerar_planilha_base.py) se existir;
+// senão, alguns exemplos fixos. Nada é gravado.
+let demoDB = null;
+async function demo(funcao, args) {
+  await new Promise(r => setTimeout(r, 250));
+  if (!demoDB) {
+    try {
+      demoDB = await (await fetch('../planilha/dados_demo.json')).json();
+      demoDB.inscricoes.push(exemplos().inscricoes[0]); // uma inscrição pendente fictícia, para testar a gestão
+      demoDB.inscricoes.sort((a, b) => a.data < b.data ? -1 : a.data > b.data ? 1 : 0);
+    } catch (_) { demoDB = exemplos(); }
+    demoDB.usuario = 'demonstracao@exemplo.com';
+  }
+  const acha = id => demoDB.inscricoes.find(i => i.id === id);
+  const titulo = n => (demoDB.catalogo.find(t => t.numero === n) || {}).titulo || '';
+  if (funcao === 'adminListar') return demoDB;
+  if (funcao === 'adminCriarEvento') {
+    const [d] = args;
+    const dp = d.tipo === TIPO_DISCURSO;
+    const novo = { id: 'E' + Date.now().toString(36).toUpperCase(), recebido: '', data: d.data,
+      horario: d.horario || (d.data >= '2027' ? '18:30' : '09:30'), nome: d.nome, congregacao: d.congregacao,
+      whatsapp: d.whatsapp, email: d.email, gmail: d.gmail, temas: dp ? [{ numero: d.tema, titulo: titulo(d.tema) }] : [],
+      temaEscolhido: dp ? d.tema : null, temaTexto: dp ? titulo(d.tema) : (d.titulo || d.tipo), hospitalidade: d.hospitalidade,
+      status: 'Confirmado', convite: '', confirmadoPor: demoDB.usuario, confirmadoEm: 'agora', obs: d.obs || 'Cadastrado manualmente', tipo: d.tipo };
+    demoDB.inscricoes.push(novo);
+    demoDB.inscricoes.sort((a, b) => a.data < b.data ? -1 : a.data > b.data ? 1 : 0);
+    return dp ? { id: novo.id, mensagem: Object.assign(mensagemDemo(novo), { email: d.gmail || '' }) } : { id: novo.id };
+  }
+  if (funcao === 'adminSubstituir') {
+    const [id, d] = args;
+    const velho = acha(id);
+    velho.status = 'Substituído';
+    velho.obs = 'Substituído por ' + d.nome;
+    const novo = { ...velho, id: 'N' + Date.now().toString(36).toUpperCase(), recebido: '', nome: d.nome, congregacao: d.congregacao,
+      whatsapp: d.whatsapp, email: d.email, gmail: d.gmail, temas: [{ numero: d.tema, titulo: titulo(d.tema) }], temaEscolhido: d.tema,
+      temaTexto: titulo(d.tema), status: 'Confirmado', convite: '', confirmadoPor: demoDB.usuario, obs: 'Substitui ' + velho.nome };
+    demoDB.inscricoes.push(novo);
+    demoDB.inscricoes.sort((a, b) => a.data < b.data ? -1 : a.data > b.data ? 1 : 0);
+    return { id: novo.id, mensagem: Object.assign(mensagemDemo(novo), { email: d.gmail || '' }) };
+  }
+  if (funcao === 'adminConfirmar' || funcao === 'adminMensagem') {
+    const x = acha(args[0]);
+    const n = args[1] || x.temaEscolhido;
+    const msg = mensagemDemo({ ...x, temaEscolhido: n, temaTexto: titulo(n) || x.temaTexto, hospitalidade: args[2] ?? x.hospitalidade });
+    if (funcao === 'adminConfirmar') msg.email = x.gmail || '';
+    return msg;
+  }
+  if (funcao === 'adminEnviarEmail') return acha(args[0]).gmail || '';
+  return true;
+}
+
+function mensagemDemo(x) {
+  const horario = x.horario || (x.data >= '2027' ? '18:30' : '09:30');
+  const texto = `Olá, ${x.nome.split(' ')[0]}! Tudo bem?\n\nSeu discurso público está *confirmado*. Muito obrigado pela disposição!\n\n` +
+    `*Data:* ${dataLonga(x.data)}, às ${horario.replace(':', 'h')}\n*Tema nº ${x.temaEscolhido}:* _${x.temaTexto}_\n` +
+    `*Local:* Congregação Maraponga\nR. Benjamim Brasil, 618 - Mondubim, Fortaleza - CE, 60712-000\n*Como chegar:* ${MAPA_DEMO}` +
+    (x.hospitalidade ? `\n*Hospitalidade:* ${x.hospitalidade}` : '') +
+    '\n\n*Seu convite* (com botões para baixar em PDF e adicionar à agenda):\n(link do convite)';
+  const dados = { n: x.nome, oc: x.congregacao, d: x.data, h: horario, t: x.temaEscolhido, tt: x.temaTexto, c: 'Maraponga',
+    e: 'R. Benjamim Brasil, 618 - Mondubim, Fortaleza - CE, 60712-000', m: MAPA_DEMO, ce: 'cong09428050@jwpub.org',
+    ct: ['Jean Pires – 85 98584-4996 – 1JeanPires@jwpub.org', 'Izaías Pereira – 85 99662-6280 – IzaiasS@jwpub.org'],
+    tel: '85985844996' };
+  const b64 = btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(dados)))).replace(/\+/g, '-').replace(/[/]/g, '_');
+  const wa = foneWa(x.whatsapp);
+  return { texto, linkConvite: '../convite.html#' + b64.replace(/=+$/, ''),
+    linkWhatsApp: wa ? `${URL_WA_ENVIAR}${wa}&text=${encodeURIComponent(texto)}` : '' };
+}
+
+function exemplos() {
+  const base = { recebido: '01/11/2026 10:12', horario: '', convite: '', hospitalidade: '', confirmadoPor: '', obs: '' };
+  return {
+    ultimas: { 32: '2026-07-12' },
+    catalogo: [
+      { numero: 10, titulo: 'Seja honesto em tudo' }, { numero: 32, titulo: 'Como lidar com as ansiedades da vida' },
+      { numero: 54, titulo: 'Fortaleça sua fé em Deus e em suas promessas' }, { numero: 66, titulo: 'Você também vai participar na colheita?' },
+    ],
+    inscricoes: [
+      { ...base, id: 'A1', data: '2026-12-13', horario: '09:30', nome: 'João Teste', congregacao: 'Jardim União', whatsapp: '(85) 99999-1234',
+        email: 'joao@jwpub.org', gmail: 'joao.teste@gmail.com', status: 'Pendente', temaEscolhido: null, temaTexto: '',
+        temas: [{ numero: 32, titulo: 'Como lidar com as ansiedades da vida' }, { numero: 54, titulo: 'Fortaleça sua fé em Deus e em suas promessas' }] },
+      { ...base, id: 'B2', data: '2027-01-09', horario: '18:30', nome: 'Pedro Exemplo', congregacao: 'Parangaba', whatsapp: '', email: '',
+        status: 'Confirmado', temaEscolhido: 66, temaTexto: 'Você também vai participar na colheita?', temas: [{ numero: 66, titulo: 'Você também vai participar na colheita?' }] },
+    ],
+  };
+}
+
+carregar();
+</script>
+</body>
+</html>
